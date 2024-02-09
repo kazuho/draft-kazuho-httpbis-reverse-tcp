@@ -64,6 +64,57 @@ tunnel.
 
 # The Protocol
 
+To setup the bi-directional byte streams, servers connect to the clients as
+specified by the URI, and issues an HTTP request to establish a tunnel.
+
+To signal the intent to establish a reverse tunnel, an upgrade token named
+"reverse" is used.
+
+The method and the conveyor of the upgrade token are different between the HTTP
+versions.
+
+
+## HTTP/1.1
+
+In HTTP/1.1, method of the issued request SHALL be "GET" and the upgrade token
+SHALL be conveyed by the "Upgrade" header field.
+
+As an upgrade is initiated, the "Connection" header specifies the "Upgrade"
+option ({{HTTP-SEMANTICS}} Section 7.8).
+
+Once the reverse tunnel is established successfuly, the client responds with a
+101 (Swithing Protocols) response.
+
+
+## HTTP/2 and HTTP/3
+
+In HTTP/2 and HTTP/3, {{EXTENDED-CONNECT-H2}} or {{EXTENDED-CONNECT-H3}} SHALL
+be used.
+
+In either version of HTTP, the method being used is "CONNECT" and the upgrade
+token is conveyed by the ":protocol" pseudo header.
+
+Once the reverse tunnel is established successfully, the client responds with a
+200 (OK) response.
+
+
+# Authentication
+
+When HTTPS is used for establishing the tunnel, both peers MAY use TLS-based
+authentication schemes to authenticate the peers. Also, servers MAY authenticate
+themselves using HTTP-based authentication schemes such as HTTP Basic
+Authentication {{?BASIC-AUTH=RFC7617}} or Cookies {{?COOKIE=RFC6265}}.
+
+
+# Forwarding Client Address
+
+When the client is acting as a TCP relay, it MAY include the "Forwarded" header
+field {{!FORWARDED=RFC7239}} in the HTTP response it sends, to indicate the
+client identity of the relayed connection.
+
+
+# Protocol Negotiation
+
 TBD
 
 
