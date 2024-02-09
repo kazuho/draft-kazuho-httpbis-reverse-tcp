@@ -64,8 +64,8 @@ tunnel.
 
 # The Protocol
 
-To setup the bi-directional byte streams, servers connect to the clients as
-specified by the URI, and issues an HTTP request to establish a tunnel.
+To setup a reverse tunnel, a server connects to the client as specified by the
+URI and issues an HTTP request.
 
 To signal the intent to establish a reverse tunnel, an upgrade token named
 "reverse" is used.
@@ -76,14 +76,14 @@ versions.
 
 ## HTTP/1.1
 
-In HTTP/1.1, method of the issued request SHALL be "GET" and the upgrade token
-SHALL be conveyed by the "Upgrade" header field.
+In HTTP/1.1, the HTTP upgrade mechanism is used ({{HTTP-SEMANTICS}} Section
+7.8).
 
-As an upgrade is initiated, the "Connection" header specifies the "Upgrade"
-option ({{HTTP-SEMANTICS}} Section 7.8).
+The method of the issued request SHALL be "GET".
 
-Once the reverse tunnel is established successfuly, the client responds with a
-101 (Swithing Protocols) response.
+The upgrade token is conveyed by the "Upgrade" header field, and once the
+reverse tunnel is established successfuly, the client responds with a 101
+(Swithing Protocols) response.
 
 
 ## HTTP/2 and HTTP/3
@@ -91,11 +91,9 @@ Once the reverse tunnel is established successfuly, the client responds with a
 In HTTP/2 and HTTP/3, extended CONNECT is used ({{EXTENDED-CONNECT-H2}} or
 {{EXTENDED-CONNECT-H3}}).
 
-In either version of HTTP, the method being used is "CONNECT" and the upgrade
-token is conveyed by the ":protocol" pseudo header.
-
-Once the reverse tunnel is established successfully, the client responds with a
-200 (OK) response.
+In both HTTP versions, the method being used is "CONNECT" and the upgrade
+token is conveyed by the ":protocol" pseudo header. Once the reverse tunnel is
+established successfully, the client responds with a 200 (OK) response.
 
 
 # Authentication
