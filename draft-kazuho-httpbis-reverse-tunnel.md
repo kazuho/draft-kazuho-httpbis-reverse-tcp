@@ -88,8 +88,8 @@ Once the reverse tunnel is established successfuly, the client responds with a
 
 ## HTTP/2 and HTTP/3
 
-In HTTP/2 and HTTP/3, {{EXTENDED-CONNECT-H2}} or {{EXTENDED-CONNECT-H3}} SHALL
-be used.
+In HTTP/2 and HTTP/3, extended CONNECT is used ({{EXTENDED-CONNECT-H2}} or
+{{EXTENDED-CONNECT-H3}}).
 
 In either version of HTTP, the method being used is "CONNECT" and the upgrade
 token is conveyed by the ":protocol" pseudo header.
@@ -100,10 +100,13 @@ Once the reverse tunnel is established successfully, the client responds with a
 
 # Authentication
 
-When HTTPS is used for establishing the tunnel, both peers MAY use TLS-based
-authentication schemes to authenticate the peers. Also, servers MAY authenticate
-themselves using HTTP-based authentication schemes such as HTTP Basic
-Authentication {{?BASIC-AUTH=RFC7617}} or Cookies {{?COOKIE=RFC6265}}.
+When HTTPS is used for establishing the tunnel, the client (i.e., the node
+acting as the TLS server) SHOULD use one of the TLS-based authentication schemes
+to identify itself.
+
+The server SHOULD authenticate itself either by using one of the HTTP-based
+authentication schemes (e.g., HTTP Basic Authentication {{?BASIC-AUTH=RFC7617}})
+or by using one of the TLS-based authentication schemes when HTTPS is used.
 
 
 # Forwarding Client Address
