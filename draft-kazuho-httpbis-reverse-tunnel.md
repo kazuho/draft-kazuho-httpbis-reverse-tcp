@@ -36,13 +36,14 @@ bypassing firewall restrictions. This approach, however, compromises network
 manageability and incurs performance penalties due to the additional routing and
 encapsulation involved.
 
-This document proposes an alternative method. Instead of utilizing VPNs, it
-describes how servers establish connections to clients over HTTP to create
-bi-directional byte streams for applications to exchange information.
-Specifically, this protocol leverages HTTP upgrades in HTTP/1.1
-({{HTTP-SEMANTICS}} Section 7.8) or the "extended CONNECT" method of HTTP/2
-({{!EXTENDED-CONNECT-H2=RFC8441}}) and HTTP/3 ({{!EXTENDED-CONNECT-H3=RFC9220}})
-to establish connections.
+This document proposes an alternative method.
+
+Instead of utilizing VPNs, it describes how servers establish connections to
+clients over HTTP to create bi-directional byte streams for applications to
+exchange information. Specifically, this protocol leverages HTTP upgrades in
+HTTP/1.1 ({{HTTP-SEMANTICS}} Section 7.8) or the "extended CONNECT" method of
+HTTP/2 ({{!EXTENDED-CONNECT-H2=RFC8441}}) and HTTP/3
+({{!EXTENDED-CONNECT-H3=RFC9220}}) to establish connections.
 
 Employing HTTP for connection establishment offers additional benefits. Beyond
 TLS-based authentication schemes, servers can authenticate themselves using
