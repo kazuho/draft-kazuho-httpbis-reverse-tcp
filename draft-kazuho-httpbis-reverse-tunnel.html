@@ -1245,8 +1245,8 @@ option (<span>[<a href="#HTTP-SEMANTICS" class="cite xref">HTTP-SEMANTICS</a>]</
         <h3 id="name-http-2-and-http-3">
 <a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-http-2-and-http-3" class="section-name selfRef">HTTP/2 and HTTP/3</a>
         </h3>
-<p id="section-3.2-1">In HTTP/2 and HTTP/3, <span>[<a href="#EXTENDED-CONNECT-H2" class="cite xref">EXTENDED-CONNECT-H2</a>]</span> or <span>[<a href="#EXTENDED-CONNECT-H3" class="cite xref">EXTENDED-CONNECT-H3</a>]</span> <span class="bcp14">SHALL</span>
-be used.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-1">In HTTP/2 and HTTP/3, extended CONNECT is used (<span>[<a href="#EXTENDED-CONNECT-H2" class="cite xref">EXTENDED-CONNECT-H2</a>]</span> or
+<span>[<a href="#EXTENDED-CONNECT-H3" class="cite xref">EXTENDED-CONNECT-H3</a>]</span>).<a href="#section-3.2-1" class="pilcrow">¶</a></p>
 <p id="section-3.2-2">In either version of HTTP, the method being used is "CONNECT" and the upgrade
 token is conveyed by the ":protocol" pseudo header.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
 <p id="section-3.2-3">Once the reverse tunnel is established successfully, the client responds with a
@@ -1260,10 +1260,12 @@ token is conveyed by the ":protocol" pseudo header.<a href="#section-3.2-2" clas
       <h2 id="name-authentication">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-authentication" class="section-name selfRef">Authentication</a>
       </h2>
-<p id="section-4-1">When HTTPS is used for establishing the tunnel, both peers <span class="bcp14">MAY</span> use TLS-based
-authentication schemes to authenticate the peers. Also, servers <span class="bcp14">MAY</span> authenticate
-themselves using HTTP-based authentication schemes such as HTTP Basic
-Authentication <span>[<a href="#BASIC-AUTH" class="cite xref">BASIC-AUTH</a>]</span> or Cookies <span>[<a href="#COOKIE" class="cite xref">COOKIE</a>]</span>.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-1">When HTTPS is used for establishing the tunnel, the client (i.e., the node
+acting as the TLS server) <span class="bcp14">SHOULD</span> use one of the TLS-based authentication schemes
+to identify itself.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">The server <span class="bcp14">SHOULD</span> authenticate itself either by using one of the HTTP-based
+authentication schemes (e.g., HTTP Basic Authentication <span>[<a href="#BASIC-AUTH" class="cite xref">BASIC-AUTH</a>]</span>)
+or by using one of the TLS-based authentication schemes when HTTPS is used.<a href="#section-4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="forwarding-client-address">
@@ -1336,12 +1338,8 @@ client identity of the relayed connection.<a href="#section-5-1" class="pilcrow"
         </h3>
 <dl class="references">
 <dt id="BASIC-AUTH">[BASIC-AUTH]</dt>
-        <dd>
-<span class="refAuthor">Reschke, J.</span>, <span class="refTitle">"The 'Basic' HTTP Authentication Scheme"</span>, <span class="seriesInfo">RFC 7617</span>, <span class="seriesInfo">DOI 10.17487/RFC7617</span>, <time datetime="2015-09" class="refDate">September 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7617">https://www.rfc-editor.org/rfc/rfc7617</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="COOKIE">[COOKIE]</dt>
       <dd>
-<span class="refAuthor">Barth, A.</span>, <span class="refTitle">"HTTP State Management Mechanism"</span>, <span class="seriesInfo">RFC 6265</span>, <span class="seriesInfo">DOI 10.17487/RFC6265</span>, <time datetime="2011-04" class="refDate">April 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6265">https://www.rfc-editor.org/rfc/rfc6265</a>&gt;</span>. </dd>
+<span class="refAuthor">Reschke, J.</span>, <span class="refTitle">"The 'Basic' HTTP Authentication Scheme"</span>, <span class="seriesInfo">RFC 7617</span>, <span class="seriesInfo">DOI 10.17487/RFC7617</span>, <time datetime="2015-09" class="refDate">September 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7617">https://www.rfc-editor.org/rfc/rfc7617</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
