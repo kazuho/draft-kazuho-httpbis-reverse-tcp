@@ -25,9 +25,9 @@ from application servers to their clients by using HTTP as a tunnel.
 
 # Introduction
 
-In typical application protocols operating run on top of TCP, clients initiate
-TCP connections by specifying the server's IP address and the port number.
-However, not all servers can accept incoming TCP connections directly.
+In typical application protocols operating on top of TCP, clients initiate TCP
+connections by specifying the server's IP address and the port number. However,
+not all servers can accept incoming TCP connections directly.
 
 Presently, servers situated behind firewalls that block incoming TCP connections
 often rely on virtual private networks (VPNs). These VPNs enable the passage of
@@ -40,8 +40,9 @@ This document proposes an alternative method. Instead of utilizing VPNs, it
 describes how servers establish connections to clients over HTTP to create
 bi-directional byte streams for applications to exchange information.
 Specifically, this protocol leverages HTTP upgrades in HTTP/1.1
-([[HTTP-SEMANTICS]] Section 7.8) or the "extended CONNECT" method of HTTP/2
-([[!RFC8441]]) and HTTP/3 ([[!RFC9220]]) to establish connections.
+({{HTTP-SEMANTICS}} Section 7.8) or the "extended CONNECT" method of HTTP/2
+({{!EXTENDED-CONNECT-H2=RFC8441}}) and HTTP/3 ({{!EXTENDED-CONNECT-H3=RFC9220}})
+to establish connections.
 
 Employing HTTP for connection establishment offers additional benefits. Beyond
 TLS-based authentication schemes, servers can authenticate themselves using
