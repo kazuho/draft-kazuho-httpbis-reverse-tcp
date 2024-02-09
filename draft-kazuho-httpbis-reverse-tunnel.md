@@ -51,6 +51,11 @@ varios HTTP-provided authentication schemes, such as HTTP authentication and
 cookies. Furthermore, clients are identified by URI rather than by IP address
 and port number, enhancing flexibility and integration with web technologies.
 
+As servers specify their clients using URIs, only clients known to a server can
+communicate directly with it. However, clients can act as relays, forwarding TCP
+connections from the Internet to the servers connected through the reverse
+tunnel.
+
 
 # Conventions and Definitions
 
