@@ -1,6 +1,6 @@
 ---
-title: "Reverse TCP over HTTP"
-docname: draft-kazuho-httpbis-reverse-tcp-latest
+title: "Reverse Tunnel over HTTP"
+docname: draft-kazuho-httpbis-reverse-tunnel-latest
 category: std
 wg: httpbis
 ipr: trust200902
