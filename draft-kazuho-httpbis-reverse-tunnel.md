@@ -114,9 +114,79 @@ field {{!FORWARDED=RFC7239}} in the HTTP response it sends, to indicate the
 client identity of the relayed connection.
 
 
-# Protocol Negotiation
+# Application-Layer Protocol Negotiation
 
-TBD
+As the use of TLS {{?TLS=RFC8446}} becomes prevalent, an increasing number of
+application protocols depend on the Application-Layer Protocol Negotiation
+Extension {{!ALPN=RFC7301}} to determine the application protocol to utilize.
+
+While TLS can be used on top of the established tunnel and the application
+protocol can be negotiated during the TLS handshake, doing so is not necessary
+to achieve the goal of encryption when the tunnel is established via HTTPS. When
+operating over HTTPS, some deployments could opt to exchange messages without
+having another layer of encryption above the tunnel.
+
+This document specifies an HTTP header-based mechanism for negotiating the
+application protocol. ALPN identifiers are used for naming the application
+protocols, so that existing application procotols can be selected.
+
+
+## Indicating Protocols Available for Use
+
+To indicate the application protocols that the server is willing to utilize, a
+server MAY include an "ALPN" header field {{!ALPN-HEADER=RFC7639}} in the HTTP
+request that it issues. The "ALPN" header field carries a list of
+application-protocol identifies that the server is willing to use.
+
+{{fig-alpn-request}} shows an HTTP/1.1 request attempting to establish a reverse
+channel that uses either HTTP/2 {{?HTTP2=RFC9113}} or HTTP/1.1
+{{?HTTP1=RFC9112}} as the application protocol.
+
+~~~
+GET /endpoint HTTP/1.1
+Connection: upgrade
+Upgrade: reverse
+ALPN: h2, http%2F1.1
+
+~~~
+{: #fig-alpn-request title="Request with an ALPN Header Field"}
+
+
+## Indicating the Chosen Protocol
+
+When a client receives an HTTP request with an "ALPN" header field, and if the
+client decides to select one of the application protocols being offered, the
+client includes a "Selected-ALPN" header field in the HTTP response.
+
+If the HTTP request does not include an "ALPN" header field, the client MUST NOT
+send a "Selected-ALPN" header field.
+
+Syntax of the "Selected-ALPN" header field is as follows. The syntax reuses the
+encoding of the "ALPN" header field, but always includes exactly one
+application-protocol identifier that is being chosen.
+
+~~~
+Selected-ALPN = ALPN
+~~~
+
+{{fig-alpn-response}} shows an HTTP/1.1 response indicating that the tunnel has
+been established with the chosen protocol being HTTP/2.
+
+~~~
+HTTP/1.1 101 Switching Protocols
+Connection: upgrade
+Upgrade: reverse
+Selected-ALPN: h2
+
+~~~
+{: #fig-alpn-response title="Response with a Selected-ALPN Header Field"}
+
+When a server receives a successful HTTP response that does not carry the
+"Selected-ALPN" header field, it could either be an indication that the server
+chose another application protocol or that the server could not determine which
+application protocol has been chosen. Therefore, the client SHOULD NOT assume
+that an application protocol other than the ones being offered has been
+selected.
 
 
 # IANA Considerations
