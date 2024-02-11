@@ -17,8 +17,8 @@ normative:
 
 --- abstract
 
-This document specifies the protocol for setting up bi-directional byte streams
-from application servers to their clients by using HTTP as a tunnel.
+This document specifies the HTTP extension for setting up bi-directional byte
+streams from application servers to their clients by using HTTP as a tunnel.
 
 
 --- middle
@@ -53,8 +53,9 @@ and port number, enhancing flexibility and integration with web technologies.
 
 As servers specify their clients using URIs, only clients known to a server can
 communicate directly with it. However, clients can act as relays, forwarding TCP
-connections or application-level messages (e.g., HTTP requests) from the
-Internet to the servers connected through the reverse tunnel.
+connections or application-level messages (e.g., HTTP requests) that they accept
+or receive from the Internet to the servers connected through the reverse
+tunnel.
 
 
 # Conventions and Definitions
