@@ -85,6 +85,20 @@ The upgrade token is conveyed by the "Upgrade" header field, and once the
 reverse tunnel is established successfuly, the client responds with a 101
 (Swithing Protocols) response.
 
+{{fig-tunnel-establishment}} shows an exchange of HTTP/1.1 request and response
+establishing a reverse tunnel.
+
+~~~
+GET /reverse-endpoint HTTP/1.1
+Connection: upgrade
+Upgrade: reverse
+
+HTTP/1.1 101 Switching Protocols
+Connection: upgrade
+Upgrade: reverse
+
+~~~
+{: #fig-tunnel-establishment title="Establishing Reverse Tunnel over HTTP/1.1"}
 
 ## HTTP/2 and HTTP/3
 
