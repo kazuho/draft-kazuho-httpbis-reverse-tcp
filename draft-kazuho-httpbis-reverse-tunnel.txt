@@ -147,7 +147,7 @@ Table of Contents
    The method of the issued request SHALL be "GET".
 
    The upgrade token is conveyed by the "Upgrade" header field, and once
-   the reverse tunnel is established successfuly, the client responds
+   the reverse tunnel is established successfully, the client responds
    with a 101 (Swithing Protocols) response.
 
    Figure 1 shows an exchange of HTTP/1.1 request and response
