@@ -215,7 +215,7 @@ channel that uses either HTTP/2 {{?HTTP2=RFC9113}} or HTTP/1.1
 {{?HTTP1=RFC9112}} as the application protocol.
 
 ~~~
-GET /endpoint HTTP/1.1
+GET /reverse-endpoint HTTP/1.1
 Connection: upgrade
 Upgrade: reverse
 ALPN: h2, http%2F1.1
