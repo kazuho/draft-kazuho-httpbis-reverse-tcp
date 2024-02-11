@@ -7,8 +7,8 @@
 <title>Reverse Tunnel over HTTP</title>
 <meta content="Kazuho Oku" name="author">
 <meta content="
-       This document specifies the protocol for setting up bi-directional byte streams
-from application servers to their clients by using HTTP as a tunnel. 
+       This document specifies the HTTP extension for setting up bi-directional byte
+streams from application servers to their clients by using HTTP as a tunnel. 
     " name="description">
 <meta content="xml2rfc 3.19.2" name="generator">
 <meta content="internet-draft" name="keyword">
@@ -1030,7 +1030,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Oku</td>
-<td class="center">Expires 12 August 2024</td>
+<td class="center">Expires 14 August 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1043,12 +1043,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-kazuho-httpbis-reverse-tunnel-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-02-09" class="published">9 February 2024</time>
+<time datetime="2024-02-11" class="published">11 February 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-08-12">12 August 2024</time></dd>
+<dd class="expires"><time datetime="2024-08-14">14 August 2024</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1061,8 +1061,8 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <h1 id="title">Reverse Tunnel over HTTP</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document specifies the protocol for setting up bi-directional byte streams
-from application servers to their clients by using HTTP as a tunnel.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document specifies the HTTP extension for setting up bi-directional byte
+streams from application servers to their clients by using HTTP as a tunnel.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-discussion-venues">
@@ -1094,7 +1094,7 @@ from application servers to their clients by using HTTP as a tunnel.<a href="#se
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 12 August 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 14 August 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1147,7 +1147,15 @@ from application servers to their clients by using HTTP as a tunnel.<a href="#se
             <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-forwarding-client-address" class="internal xref">Forwarding Client Address</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-protocol-negotiation" class="internal xref">Protocol Negotiation</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-application-layer-protocol-" class="internal xref">Application-Layer Protocol Negotiation</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-indicating-protocols-availa" class="internal xref">Indicating Protocols Available for Use</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-indicating-the-chosen-proto" class="internal xref">Indicating the Chosen Protocol</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
             <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
@@ -1201,7 +1209,8 @@ cookies. Furthermore, clients are identified by URI rather than by IP address
 and port number, enhancing flexibility and integration with web technologies.<a href="#section-1-5" class="pilcrow">¶</a></p>
 <p id="section-1-6">As servers specify their clients using URIs, only clients known to a server can
 communicate directly with it. However, clients can act as relays, forwarding TCP
-connections from the Internet to the servers connected through the reverse
+connections or application-level messages (e.g., HTTP requests) that they accept
+or receive from the Internet to the servers connected through the reverse
 tunnel.<a href="#section-1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1221,8 +1230,8 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
       <h2 id="name-the-protocol">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-the-protocol" class="section-name selfRef">The Protocol</a>
       </h2>
-<p id="section-3-1">To setup the bi-directional byte streams, servers connect to the clients as
-specified by the URI, and issues an HTTP request to establish a tunnel.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-1">To setup a reverse tunnel, a server connects to the client as specified by the
+URI and issues an HTTP request.<a href="#section-3-1" class="pilcrow">¶</a></p>
 <p id="section-3-2">To signal the intent to establish a reverse tunnel, an upgrade token named
 "reverse" is used.<a href="#section-3-2" class="pilcrow">¶</a></p>
 <p id="section-3-3">The method and the conveyor of the upgrade token are different between the HTTP
@@ -1232,12 +1241,32 @@ versions.<a href="#section-3-3" class="pilcrow">¶</a></p>
         <h3 id="name-http-11">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-http-11" class="section-name selfRef">HTTP/1.1</a>
         </h3>
-<p id="section-3.1-1">In HTTP/1.1, method of the issued request <span class="bcp14">SHALL</span> be "GET" and the upgrade token
-<span class="bcp14">SHALL</span> be conveyed by the "Upgrade" header field.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
-<p id="section-3.1-2">As an upgrade is initiated, the "Connection" header specifies the "Upgrade"
-option (<span>[<a href="#HTTP-SEMANTICS" class="cite xref">HTTP-SEMANTICS</a>]</span> Section 7.8).<a href="#section-3.1-2" class="pilcrow">¶</a></p>
-<p id="section-3.1-3">Once the reverse tunnel is established successfuly, the client responds with a
-101 (Swithing Protocols) response.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-1">In HTTP/1.1, the HTTP upgrade mechanism is used (<span>[<a href="#HTTP-SEMANTICS" class="cite xref">HTTP-SEMANTICS</a>]</span> Section
+7.8).<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">The method of the issued request <span class="bcp14">SHALL</span> be "GET".<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-3">The upgrade token is conveyed by the "Upgrade" header field, and once the
+reverse tunnel is established successfuly, the client responds with a 101
+(Swithing Protocols) response.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-4"><a href="#fig-tunnel-establishment" class="auto internal xref">Figure 1</a> shows an exchange of HTTP/1.1 request and response
+establishing a reverse tunnel.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+<span id="name-establishing-reverse-tunnel"></span><div id="fig-tunnel-establishment">
+<figure id="figure-1">
+          <div class="alignLeft art-text artwork" id="section-3.1-5.1">
+<pre>
+GET /reverse-endpoint HTTP/1.1
+Connection: upgrade
+Upgrade: reverse
+
+HTTP/1.1 101 Switching Protocols
+Connection: upgrade
+Upgrade: reverse
+
+</pre>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-establishing-reverse-tunnel" class="selfRef">Establishing Reverse Tunnel over HTTP/1.1</a>
+          </figcaption></figure>
+</div>
 </section>
 </div>
 <div id="http2-and-http3">
@@ -1247,10 +1276,9 @@ option (<span>[<a href="#HTTP-SEMANTICS" class="cite xref">HTTP-SEMANTICS</a>]</
         </h3>
 <p id="section-3.2-1">In HTTP/2 and HTTP/3, extended CONNECT is used (<span>[<a href="#EXTENDED-CONNECT-H2" class="cite xref">EXTENDED-CONNECT-H2</a>]</span> or
 <span>[<a href="#EXTENDED-CONNECT-H3" class="cite xref">EXTENDED-CONNECT-H3</a>]</span>).<a href="#section-3.2-1" class="pilcrow">¶</a></p>
-<p id="section-3.2-2">In either version of HTTP, the method being used is "CONNECT" and the upgrade
-token is conveyed by the ":protocol" pseudo header.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
-<p id="section-3.2-3">Once the reverse tunnel is established successfully, the client responds with a
-200 (OK) response.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">In both HTTP versions, the method being used is "CONNECT" and the upgrade
+token is conveyed by the ":protocol" pseudo header. Once the reverse tunnel is
+established successfully, the client responds with a 200 (OK) response.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1273,17 +1301,124 @@ or by using one of the TLS-based authentication schemes when HTTPS is used.<a hr
       <h2 id="name-forwarding-client-address">
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-forwarding-client-address" class="section-name selfRef">Forwarding Client Address</a>
       </h2>
-<p id="section-5-1">When the client is acting as a TCP relay, it <span class="bcp14">MAY</span> include the "Forwarded" header
-field <span>[<a href="#FORWARDED" class="cite xref">FORWARDED</a>]</span> in the HTTP response it sends, to indicate the
-client identity of the relayed connection.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-1">When sending a successful HTTP response, clients <span class="bcp14">MAY</span> include the "Forwarded"
+header field <span>[<a href="#FORWARDED" class="cite xref">FORWARDED</a>]</span> in the HTTP response to indicate the client
+identity of the relayed connection. For clients acting as a transport-layer
+relay, use of the "Forwarded" response header field is the only way to relay the
+identity.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2"><a href="#fig-client-address" class="auto internal xref">Figure 2</a> shows an HTTP/1.1 response conveying the client IP
+address of the connection being relayed.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<span id="name-response-with-a-forwarded-h"></span><div id="fig-client-address">
+<figure id="figure-2">
+        <div class="alignLeft art-text artwork" id="section-5-3.1">
+<pre>
+HTTP/1.1 101 Switching Protocols
+Connection: upgrade
+Upgrade: reverse
+Forwarded: for=192.0.2.43
+
+</pre>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-response-with-a-forwarded-h" class="selfRef">Response with a Forwarded Header Field</a>
+        </figcaption></figure>
+</div>
+<p id="section-5-4">When the client is an application-protocol relay, it <span class="bcp14">MAY</span> use the mechanism
+provided by the application protocols to relay the identity of the client being
+relayed. For example, a client acting as a HTTP proxy can forward HTTP requests
+to servers at the HTTP request level, indicating the IP address of the HTTP
+clients by adding the Forwarded header field to each of the HTTP request that it
+forwards.<a href="#section-5-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="protocol-negotiation">
+<div id="application-layer-protocol-negotiation">
 <section id="section-6">
-      <h2 id="name-protocol-negotiation">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-protocol-negotiation" class="section-name selfRef">Protocol Negotiation</a>
+      <h2 id="name-application-layer-protocol-">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-application-layer-protocol-" class="section-name selfRef">Application-Layer Protocol Negotiation</a>
       </h2>
-<p id="section-6-1">TBD<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-1">As the use of TLS <span>[<a href="#TLS" class="cite xref">TLS</a>]</span> becomes prevalent, an increasing number of
+application protocols depend on the Application-Layer Protocol Negotiation
+Extension <span>[<a href="#ALPN" class="cite xref">ALPN</a>]</span> to determine the application protocol to utilize.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">While TLS can be used on top of the established tunnel and the application
+protocol can be negotiated during the TLS handshake, doing so is not necessary
+to achieve the goal of encryption when the tunnel is established via HTTPS. When
+operating over HTTPS, some deployments could opt to exchange messages without
+having another layer of encryption above the tunnel.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<p id="section-6-3">This document specifies an HTTP header-based mechanism for negotiating the
+application protocol. ALPN identifiers are used for naming the application
+protocols, so that existing application procotols can be selected.<a href="#section-6-3" class="pilcrow">¶</a></p>
+<div id="indicating-protocols-available-for-use">
+<section id="section-6.1">
+        <h3 id="name-indicating-protocols-availa">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-indicating-protocols-availa" class="section-name selfRef">Indicating Protocols Available for Use</a>
+        </h3>
+<p id="section-6.1-1">To indicate the application protocols that the server is willing to utilize, a
+server <span class="bcp14">MAY</span> include an "ALPN" header field <span>[<a href="#ALPN-HEADER" class="cite xref">ALPN-HEADER</a>]</span> in the HTTP
+request that it issues. The "ALPN" header field carries a list of
+application-protocol identifies that the server is willing to use.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-2"><a href="#fig-alpn-request" class="auto internal xref">Figure 3</a> shows an HTTP/1.1 request attempting to establish a reverse
+channel that uses either HTTP/2 <span>[<a href="#HTTP2" class="cite xref">HTTP2</a>]</span> or HTTP/1.1
+<span>[<a href="#HTTP1" class="cite xref">HTTP1</a>]</span> as the application protocol.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<span id="name-request-with-an-alpn-header"></span><div id="fig-alpn-request">
+<figure id="figure-3">
+          <div class="alignLeft art-text artwork" id="section-6.1-3.1">
+<pre>
+GET /endpoint HTTP/1.1
+Connection: upgrade
+Upgrade: reverse
+ALPN: h2, http%2F1.1
+
+</pre>
+</div>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-request-with-an-alpn-header" class="selfRef">Request with an ALPN Header Field</a>
+          </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="indicating-the-chosen-protocol">
+<section id="section-6.2">
+        <h3 id="name-indicating-the-chosen-proto">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-indicating-the-chosen-proto" class="section-name selfRef">Indicating the Chosen Protocol</a>
+        </h3>
+<p id="section-6.2-1">When a client receives an HTTP request with an "ALPN" header field, and if the
+client decides to select one of the application protocols being offered, the
+client includes a "Selected-ALPN" header field in the HTTP response.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">If the HTTP request does not include an "ALPN" header field, the client <span class="bcp14">MUST NOT</span>
+send a "Selected-ALPN" header field.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+<p id="section-6.2-3">Syntax of the "Selected-ALPN" header field is as follows. The syntax reuses the
+encoding of the "ALPN" header field, but always includes exactly one
+application-protocol identifier that is being chosen.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-6.2-4">
+<pre>
+Selected-ALPN = ALPN
+</pre><a href="#section-6.2-4" class="pilcrow">¶</a>
+</div>
+<p id="section-6.2-5"><a href="#fig-alpn-response" class="auto internal xref">Figure 4</a> shows an HTTP/1.1 response indicating that the tunnel has
+been established with the chosen protocol being HTTP/2.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
+<span id="name-response-with-a-selected-al"></span><div id="fig-alpn-response">
+<figure id="figure-4">
+          <div class="alignLeft art-text artwork" id="section-6.2-6.1">
+<pre>
+HTTP/1.1 101 Switching Protocols
+Connection: upgrade
+Upgrade: reverse
+Selected-ALPN: h2
+
+</pre>
+</div>
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<a href="#name-response-with-a-selected-al" class="selfRef">Response with a Selected-ALPN Header Field</a>
+          </figcaption></figure>
+</div>
+<p id="section-6.2-7">When a server receives a successful HTTP response that does not carry the
+"Selected-ALPN" header field, it could either be an indication that the server
+chose another application protocol or that the server could not determine which
+application protocol has been chosen. Therefore, the client <span class="bcp14">SHOULD NOT</span> assume
+that an application protocol other than the ones being offered has been
+selected.<a href="#section-6.2-7" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="iana-considerations">
@@ -1291,7 +1426,7 @@ client identity of the relayed connection.<a href="#section-5-1" class="pilcrow"
       <h2 id="name-iana-considerations">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-7-1">This document has no IANA actions.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-1">TBD.<a href="#section-7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <section id="section-8">
@@ -1304,6 +1439,14 @@ client identity of the relayed connection.<a href="#section-5-1" class="pilcrow"
 <a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
+<dt id="ALPN">[ALPN]</dt>
+        <dd>
+<span class="refAuthor">Friedl, S.</span>, <span class="refAuthor">Popov, A.</span>, <span class="refAuthor">Langley, A.</span>, and <span class="refAuthor">E. Stephan</span>, <span class="refTitle">"Transport Layer Security (TLS) Application-Layer Protocol Negotiation Extension"</span>, <span class="seriesInfo">RFC 7301</span>, <span class="seriesInfo">DOI 10.17487/RFC7301</span>, <time datetime="2014-07" class="refDate">July 2014</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7301">https://www.rfc-editor.org/rfc/rfc7301</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="ALPN-HEADER">[ALPN-HEADER]</dt>
+        <dd>
+<span class="refAuthor">Hutton, A.</span>, <span class="refAuthor">Uberti, J.</span>, and <span class="refAuthor">M. Thomson</span>, <span class="refTitle">"The ALPN HTTP Header Field"</span>, <span class="seriesInfo">RFC 7639</span>, <span class="seriesInfo">DOI 10.17487/RFC7639</span>, <time datetime="2015-08" class="refDate">August 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7639">https://www.rfc-editor.org/rfc/rfc7639</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="EXTENDED-CONNECT-H2">[EXTENDED-CONNECT-H2]</dt>
         <dd>
 <span class="refAuthor">McManus, P.</span>, <span class="refTitle">"Bootstrapping WebSockets with HTTP/2"</span>, <span class="seriesInfo">RFC 8441</span>, <span class="seriesInfo">DOI 10.17487/RFC8441</span>, <time datetime="2018-09" class="refDate">September 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8441">https://www.rfc-editor.org/rfc/rfc8441</a>&gt;</span>. </dd>
@@ -1338,8 +1481,20 @@ client identity of the relayed connection.<a href="#section-5-1" class="pilcrow"
         </h3>
 <dl class="references">
 <dt id="BASIC-AUTH">[BASIC-AUTH]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Reschke, J.</span>, <span class="refTitle">"The 'Basic' HTTP Authentication Scheme"</span>, <span class="seriesInfo">RFC 7617</span>, <span class="seriesInfo">DOI 10.17487/RFC7617</span>, <time datetime="2015-09" class="refDate">September 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7617">https://www.rfc-editor.org/rfc/rfc7617</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="HTTP1">[HTTP1]</dt>
+        <dd>
+<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP/1.1"</span>, <span class="seriesInfo">STD 99</span>, <span class="seriesInfo">RFC 9112</span>, <span class="seriesInfo">DOI 10.17487/RFC9112</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9112">https://www.rfc-editor.org/rfc/rfc9112</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="HTTP2">[HTTP2]</dt>
+        <dd>
+<span class="refAuthor">Thomson, M., Ed.</span> and <span class="refAuthor">C. Benfield, Ed.</span>, <span class="refTitle">"HTTP/2"</span>, <span class="seriesInfo">RFC 9113</span>, <span class="seriesInfo">DOI 10.17487/RFC9113</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9113">https://www.rfc-editor.org/rfc/rfc9113</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="TLS">[TLS]</dt>
+      <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
