@@ -17,8 +17,12 @@ normative:
 
 --- abstract
 
-This document specifies the HTTP extension for setting up bi-directional byte
-streams from application servers to their clients by using HTTP as a tunnel.
+This document specifies an HTTP extension to establish bi-directional byte
+streams in the direction from servers to their clients, utilizing HTTP as a
+tunneling mechanism. This approach facilitates the operation of servers located
+behind firewalls, which accept connections through TCP relays, as well as
+application-protocol-specific servers, such as HTTP origins connecting to HTTP
+proxies.
 
 
 --- middle
