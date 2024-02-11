@@ -81,8 +81,8 @@ versions.
 
 ## HTTP/1.1
 
-In HTTP/1.1, the HTTP upgrade mechanism is used ({{HTTP-SEMANTICS}} Section
-7.8).
+In HTTP/1.1, the HTTP upgrade mechanism ({{HTTP-SEMANTICS}} Section 7.8) is
+used.
 
 The method of the issued request SHALL be "GET".
 
