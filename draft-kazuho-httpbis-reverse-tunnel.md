@@ -264,20 +264,6 @@ server MAY include an "ALPN" header field {{!ALPN-HEADER=RFC7639}} in the HTTP
 request that it issues. The "ALPN" header field carries a list of
 application-protocol identifies that the server is willing to use.
 
-{{fig-alpn-request}} shows an HTTP/1.1 request attempting to establish a reverse
-channel that uses either HTTP/2 {{?HTTP2=RFC9113}} or HTTP/1.1
-{{?HTTP1=RFC9112}} as the application protocol.
-
-~~~
-GET /reverse-endpoint HTTP/1.1
-Host: example.com
-Connection: upgrade
-Upgrade: reverse
-ALPN: h2, http%2F1.1
-
-~~~
-{: #fig-alpn-request title="Request with an ALPN Header Field"}
-
 
 ## Indicating the Chosen Protocol
 
@@ -296,17 +282,24 @@ application-protocol identifier that is being chosen.
 Selected-ALPN = ALPN
 ~~~
 
-{{fig-alpn-response}} shows an HTTP/1.1 response indicating that the tunnel has
-been established with the chosen protocol being HTTP/2.
+{{fig-alpn-request}} shows an exchange of HTTP/1.1 response and response that
+sets up a tunnel for forwarding HTTP requests using HTTP/2, where tunnel server
+is the origin and the tunnel client is the reverse proxy.
 
 ~~~
+GET /reverse-connect/proxy/for/service/X HTTP/1.1
+Host: example.com
+Connection: upgrade
+Upgrade: reverse
+ALPN: h2, http%2F1.1
+
 HTTP/1.1 101 Switching Protocols
 Connection: upgrade
 Upgrade: reverse
 Selected-ALPN: h2
 
 ~~~
-{: #fig-alpn-response title="Response with a Selected-ALPN Header Field"}
+{: #fig-alpn-request title="Setting up a HTTP/2 Tunnel for forwarding HTTP Requests"}
 
 When a server sends an HTTP request with an "ALPN" header field but receives a
 successful response without a "Selected-ALPN" header field, it could either be
