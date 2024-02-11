@@ -13,9 +13,12 @@ Expires: 14 August 2024
 
 Abstract
 
-   This document specifies the HTTP extension for setting up bi-
-   directional byte streams from application servers to their clients by
-   using HTTP as a tunnel.
+   This document specifies an HTTP extension to establish bi-directional
+   byte streams in the direction from servers to their clients,
+   utilizing HTTP as a tunneling mechanism.  This approach facilitates
+   the operation of servers located behind firewalls, which accept
+   connections through TCP relays, as well as application-protocol-
+   specific servers, such as HTTP origins connecting to HTTP proxies.
 
 Discussion Venues
 
@@ -174,7 +177,7 @@ Table of Contents
 4.  Authentication
 
    When HTTPS is used for establishing the tunnel, the client (i.e., the
-   node acting as the TLS server) SHOULD use one of the TLS-based
+   node acting as the TLS [TLS] server) SHOULD use one of the TLS-based
    authentication schemes to identify itself.
 
    The server SHOULD authenticate itself either by using one of the
@@ -242,22 +245,27 @@ Table of Contents
 
 6.  Application-Layer Protocol Negotiation
 
-   As the use of TLS [TLS] becomes prevalent, an increasing number of
-   application protocols depend on the Application-Layer Protocol
-   Negotiation Extension [ALPN] to determine the application protocol to
-   utilize.
+   While TLS [TLS] can be used on top of an established tunnel, doing so
+   might not be necessary for ensuring the security of communication if
+   the tunnel is established via HTTPS, and the client side of the
+   reverse tunnel also functions as the client side of the application
+   protocol in use.  A typical scenario involves an HTTPS reverse proxy
+   serving as the client of a reverse tunnel.  This proxy terminates
+   incoming TLS connections and decrypts the HTTP requests before
+   forwarding them through the reverse tunnel, which is secured by a
+   separate TLS connection.
 
-   While TLS can be used on top of the established tunnel and the
-   application protocol can be negotiated during the TLS handshake,
-   doing so is not necessary to achieve the goal of encryption when the
-   tunnel is established via HTTPS.  When operating over HTTPS, some
-   deployments could opt to exchange messages without having another
-   layer of encryption above the tunnel.
+   In these deployments, foregoing the use of TLS above the established
+   tunnel can yield performance benefits without compromising security.
+   However, this approach requires that endpoints negotiate the
+   application protocol without relying on the Application-Layer
+   Protocol Negotiation [ALPN] performed during the TLS handshake.
 
-   This document specifies an HTTP header-based mechanism for
-   negotiating the application protocol.  ALPN identifiers are used for
-   naming the application protocols, so that existing application
-   procotols can be selected.
+   To address this need, this document introduces an HTTP header-based
+   mechanism for negotiating the application protocol.  It employs ALPN
+   identifiers for naming the application protocols, allowing for the
+   selection of existing application protocols without depending on TLS-
+   based negotiation.
 
 6.1.  Indicating Protocols Available for Use
 
@@ -304,12 +312,13 @@ Table of Contents
 
             Figure 4: Response with a Selected-ALPN Header Field
 
-   When a server receives a successful HTTP response that does not carry
-   the "Selected-ALPN" header field, it could either be an indication
-   that the server chose another application protocol or that the server
-   could not determine which application protocol has been chosen.
-   Therefore, the client SHOULD NOT assume that an application protocol
-   other than the ones being offered has been selected.
+   When a server sends an HTTP request with an "ALPN" header field but
+   receives a successful response without a "Selected-ALPN" header
+   field, it could either be an indication that the client chose an
+   application protocol that the server did not offer, or that the
+   server could not determine which application protocol has been
+   chosen.  Therefore, the client SHOULD NOT assume that an application
+   protocol other than the ones being offered has been selected.
 
 7.  IANA Considerations
 

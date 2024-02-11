@@ -7,8 +7,12 @@
 <title>Reverse Tunnel over HTTP</title>
 <meta content="Kazuho Oku" name="author">
 <meta content="
-       This document specifies the HTTP extension for setting up bi-directional byte
-streams from application servers to their clients by using HTTP as a tunnel. 
+       This document specifies an HTTP extension to establish bi-directional byte
+streams in the direction from servers to their clients, utilizing HTTP as a
+tunneling mechanism. This approach facilitates the operation of servers located
+behind firewalls, which accept connections through TCP relays, as well as
+application-protocol-specific servers, such as HTTP origins connecting to HTTP
+proxies. 
     " name="description">
 <meta content="xml2rfc 3.19.2" name="generator">
 <meta content="internet-draft" name="keyword">
@@ -1061,8 +1065,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <h1 id="title">Reverse Tunnel over HTTP</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document specifies the HTTP extension for setting up bi-directional byte
-streams from application servers to their clients by using HTTP as a tunnel.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document specifies an HTTP extension to establish bi-directional byte
+streams in the direction from servers to their clients, utilizing HTTP as a
+tunneling mechanism. This approach facilitates the operation of servers located
+behind firewalls, which accept connections through TCP relays, as well as
+application-protocol-specific servers, such as HTTP origins connecting to HTTP
+proxies.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-discussion-venues">
@@ -1297,8 +1305,8 @@ established successfully, the client responds with a 200 (OK) response.<a href="
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-authentication" class="section-name selfRef">Authentication</a>
       </h2>
 <p id="section-4-1">When HTTPS is used for establishing the tunnel, the client (i.e., the node
-acting as the TLS server) <span class="bcp14">SHOULD</span> use one of the TLS-based authentication schemes
-to identify itself.<a href="#section-4-1" class="pilcrow">¶</a></p>
+acting as the TLS <span>[<a href="#TLS" class="cite xref">TLS</a>]</span> server) <span class="bcp14">SHOULD</span> use one of the TLS-based
+authentication schemes to identify itself.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <p id="section-4-2">The server <span class="bcp14">SHOULD</span> authenticate itself either by using one of the HTTP-based
 authentication schemes (e.g., HTTP Basic Authentication <span>[<a href="#BASIC-AUTH" class="cite xref">BASIC-AUTH</a>]</span>)
 or by using one of the TLS-based authentication schemes when HTTPS is used.<a href="#section-4-2" class="pilcrow">¶</a></p>
@@ -1382,17 +1390,23 @@ forwards.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
       <h2 id="name-application-layer-protocol-">
 <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-application-layer-protocol-" class="section-name selfRef">Application-Layer Protocol Negotiation</a>
       </h2>
-<p id="section-6-1">As the use of TLS <span>[<a href="#TLS" class="cite xref">TLS</a>]</span> becomes prevalent, an increasing number of
-application protocols depend on the Application-Layer Protocol Negotiation
-Extension <span>[<a href="#ALPN" class="cite xref">ALPN</a>]</span> to determine the application protocol to utilize.<a href="#section-6-1" class="pilcrow">¶</a></p>
-<p id="section-6-2">While TLS can be used on top of the established tunnel and the application
-protocol can be negotiated during the TLS handshake, doing so is not necessary
-to achieve the goal of encryption when the tunnel is established via HTTPS. When
-operating over HTTPS, some deployments could opt to exchange messages without
-having another layer of encryption above the tunnel.<a href="#section-6-2" class="pilcrow">¶</a></p>
-<p id="section-6-3">This document specifies an HTTP header-based mechanism for negotiating the
-application protocol. ALPN identifiers are used for naming the application
-protocols, so that existing application procotols can be selected.<a href="#section-6-3" class="pilcrow">¶</a></p>
+<p id="section-6-1">While TLS <span>[<a href="#TLS" class="cite xref">TLS</a>]</span> can be used on top of an established tunnel, doing so might
+not be necessary for ensuring the security of communication if the tunnel is
+established via HTTPS, and the client side of the reverse tunnel also functions
+as the client side of the application protocol in use. A typical scenario
+involves an HTTPS reverse proxy serving as the client of a reverse tunnel. This
+proxy terminates incoming TLS connections and decrypts the HTTP requests before
+forwarding them through the reverse tunnel, which is secured by a separate TLS
+connection.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">In these deployments, foregoing the use of TLS above the established tunnel can
+yield performance benefits without compromising security. However, this approach
+requires that endpoints negotiate the application protocol without relying on
+the Application-Layer Protocol Negotiation <span>[<a href="#ALPN" class="cite xref">ALPN</a>]</span> performed during
+the TLS handshake.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<p id="section-6-3">To address this need, this document introduces an HTTP header-based mechanism
+for negotiating the application protocol. It employs ALPN identifiers for naming
+the application protocols, allowing for the selection of existing application
+protocols without depending on TLS-based negotiation.<a href="#section-6-3" class="pilcrow">¶</a></p>
 <div id="indicating-protocols-available-for-use">
 <section id="section-6.1">
         <h3 id="name-indicating-protocols-availa">
@@ -1457,12 +1471,12 @@ Selected-ALPN: h2
 <a href="#name-response-with-a-selected-al" class="selfRef">Response with a Selected-ALPN Header Field</a>
           </figcaption></figure>
 </div>
-<p id="section-6.2-7">When a server receives a successful HTTP response that does not carry the
-"Selected-ALPN" header field, it could either be an indication that the server
-chose another application protocol or that the server could not determine which
-application protocol has been chosen. Therefore, the client <span class="bcp14">SHOULD NOT</span> assume
-that an application protocol other than the ones being offered has been
-selected.<a href="#section-6.2-7" class="pilcrow">¶</a></p>
+<p id="section-6.2-7">When a server sends an HTTP request with an "ALPN" header field but receives a
+successful response without a "Selected-ALPN" header field, it could either be
+an indication that the client chose an application protocol that the server did
+not offer, or that the server could not determine which application protocol has
+been chosen. Therefore, the client <span class="bcp14">SHOULD NOT</span> assume that an application
+protocol other than the ones being offered has been selected.<a href="#section-6.2-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
