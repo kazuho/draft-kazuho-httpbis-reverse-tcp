@@ -113,6 +113,17 @@ When the client is acting as a TCP relay, it MAY include the "Forwarded" header
 field {{!FORWARDED=RFC7239}} in the HTTP response it sends, to indicate the
 client identity of the relayed connection.
 
+{{fig-client-address}} shows an HTTP/1.1 response conveying the client IP
+address of the connection being relayed.
+
+~~~
+HTTP/1.1 101 Switching Protocols
+Connection: upgrade
+Upgrade: reverse
+Forwarded: for=192.0.2.43
+
+~~~
+{: #fig-client-address title="Response with a Forwarded Header Field"}
 
 # Application-Layer Protocol Negotiation
 
