@@ -153,6 +153,7 @@ Table of Contents
    establishing a reverse tunnel.
 
    GET /reverse-endpoint HTTP/1.1
+   Host: example.com
    Connection: upgrade
    Upgrade: reverse
 
@@ -215,6 +216,7 @@ Table of Contents
    reverse TCP relay.
 
    GET /reverse-tcp-relay HTTP/1.1
+   Host: example.com
    Connection: upgrade
    Upgrade: reverse
 
@@ -272,7 +274,8 @@ Table of Contents
    channel that uses either HTTP/2 [HTTP2] or HTTP/1.1 [HTTP1] as the
    application protocol.
 
-   GET /endpoint HTTP/1.1
+   GET /reverse-endpoint HTTP/1.1
+   Host: example.com
    Connection: upgrade
    Upgrade: reverse
    ALPN: h2, http%2F1.1

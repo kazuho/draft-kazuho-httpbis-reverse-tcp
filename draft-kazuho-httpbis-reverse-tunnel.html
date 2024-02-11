@@ -1262,6 +1262,7 @@ establishing a reverse tunnel.<a href="#section-3.1-4" class="pilcrow">¶</a></p
           <div class="alignLeft art-text artwork" id="section-3.1-5.1">
 <pre>
 GET /reverse-endpoint HTTP/1.1
+Host: example.com
 Connection: upgrade
 Upgrade: reverse
 
@@ -1335,6 +1336,7 @@ reverse TCP relay.<a href="#section-5-7" class="pilcrow">¶</a></p>
         <div class="alignLeft art-text artwork" id="section-5-8.1">
 <pre>
 GET /reverse-tcp-relay HTTP/1.1
+Host: example.com
 Connection: upgrade
 Upgrade: reverse
 
@@ -1398,7 +1400,8 @@ channel that uses either HTTP/2 <span>[<a href="#HTTP2" class="cite xref">HTTP2<
 <figure id="figure-3">
           <div class="alignLeft art-text artwork" id="section-6.1-3.1">
 <pre>
-GET /endpoint HTTP/1.1
+GET /reverse-endpoint HTTP/1.1
+Host: example.com
 Connection: upgrade
 Upgrade: reverse
 ALPN: h2, http%2F1.1
