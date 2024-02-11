@@ -128,43 +128,33 @@ or by using one of the TLS-based authentication schemes when HTTPS is used.
 
 # Relaying Connections
 
-When the client is acting as a transport-layer protocol relay (i.e., forwarding
-connections), it is the responsibility of the reverse tunnel protocol to
-indicate when the relayed connection has been established and also the identity
-of the client.
-
-
-## Indicating Stand-by for Incoming Connections
-
-When a client acting as a transport-layer protocol relay receives a request to
-establish a reverse tunnel, the client SHOULD intially send an informational
-HTTP response of status code 100 (Continue), to indicate that the client is
-willing to serve as a tunnel but that no connections are immediately available
-to be relayed.
-
-Once a connection to be relayed becomes available, the client sends a successful
-response (i.e., 101 Switching Protocols or 200 OK depending on the version of
-the HTTP protocol being used) to indicate that the client has started to act as
-a relay.
-
-The client MAY send 100 responses more than once.
-
-If the client instantly matched a connection to be relayed to the tunnel
-establishment request, the client MAY omit the 100 response and send a
-successful response immediately.
-
-
-## Forwarding Client Address
-
-When sending a successful HTTP response, clients MAY include the "Forwarded"
-header field {{!FORWARDED=RFC7239}} in the HTTP response to indicate the client
-identity of the relayed connection. For clients acting as a transport-layer
-relay, use of the "Forwarded" response header field is the only way to relay the
-identity.
-
-{{fig-tcp-relay}} shows an exchange of HTTP/1.1 messages to establish a reverse
-TCP relay, with the final response indicating the client-side address of the
+When the client acts as a transport-layer protocol relay (i.e., forwarding TCP
+connections), it is crucial for the reverse tunnel protocol to both signal the
+establishment of the relayed connection and identify the client-side of the
 connection being relayed.
+
+Upon receiving a request to establish a reverse tunnel, a client acting as a
+relay SHOULD initially send an informational HTTP response with the status code
+100 (Continue). This indicates that the client may serve as a tunnel, but no
+connections are immediately available to be relayed.
+
+Once a connection eligible for relay becomes available, the client sends a
+successful response (i.e., 101 Switching Protocols or 200 OK, depending on the
+HTTP protocol version in use) to indicate the commencement of its relay
+operations.
+
+This successful response SHOULD include the "Forwarded" header field
+{{!FORWARDED=RFC7239}} that identifies the client side of the connection being
+relayed.
+
+The client MAY issue 100 (Continue) responses multiple times.
+
+If the client instantly matches a connection to be relayed upon receiving a
+tunnel establishment request, the client MAY omit the 100 (Continue) response
+and directly send a successful response.
+
+{{fig-tcp-relay}} illustrates an exchange of HTTP/1.1 messages to establish a
+reverse TCP relay.
 
 ~~~
 GET /reverse-tcp-relay HTTP/1.1
@@ -181,12 +171,13 @@ Forwarded: for=192.0.2.43
 ~~~
 {: #fig-tcp-relay title="Establishing a TCP relay"}
 
-When the client is an application-protocol relay, it MAY use the mechanism
-provided by the application protocols to relay the identity of the client being
-relayed. For example, a client acting as a HTTP proxy can forward HTTP requests
-to servers at the HTTP request level, indicating the IP address of the HTTP
-clients by adding the Forwarded header field to each of the HTTP request that it
-forwards.
+When the client is forwarding at the application protocol layer, rather than
+relaying the bytes exchanged on the transport, the client MAY use mechanisms
+provided by the application protocols to convey the identity of the client being
+relayed. For instance, a client acting as an HTTP proxy can forward HTTP
+requests to servers on the HTTP request level, incorporating the IP address of
+the original HTTP clients by adding the "Forwarded" header field to each HTTP
+request it forwards.
 
 
 # Application-Layer Protocol Negotiation
