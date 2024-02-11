@@ -158,7 +158,7 @@ and directly send a successful response.
 reverse TCP relay.
 
 ~~~
-GET /reverse-tcp-relay HTTP/1.1
+GET /.well-known/reverse/tcp/0.0.0.0/443/ HTTP/1.1
 Host: example.com
 Connection: upgrade
 Upgrade: reverse
