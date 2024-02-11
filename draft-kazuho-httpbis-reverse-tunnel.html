@@ -1144,7 +1144,15 @@ streams from application servers to their clients by using HTTP as a tunnel.<a h
             <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-authentication" class="internal xref">Authentication</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-forwarding-client-address" class="internal xref">Forwarding Client Address</a></p>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-relaying-connections" class="internal xref">Relaying Connections</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-indicating-stand-by-for-inc" class="internal xref">Indicating Stand-by for Incoming Connections</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-forwarding-client-address" class="internal xref">Forwarding Client Address</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
             <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-application-layer-protocol-" class="internal xref">Application-Layer Protocol Negotiation</a></p>
@@ -1296,22 +1304,58 @@ authentication schemes (e.g., HTTP Basic Authentication <span>[<a href="#BASIC-A
 or by using one of the TLS-based authentication schemes when HTTPS is used.<a href="#section-4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="forwarding-client-address">
+<div id="relaying-connections">
 <section id="section-5">
-      <h2 id="name-forwarding-client-address">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-forwarding-client-address" class="section-name selfRef">Forwarding Client Address</a>
+      <h2 id="name-relaying-connections">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-relaying-connections" class="section-name selfRef">Relaying Connections</a>
       </h2>
-<p id="section-5-1">When sending a successful HTTP response, clients <span class="bcp14">MAY</span> include the "Forwarded"
+<p id="section-5-1">When the client is acting as a transport-layer protocol relay (i.e., forwarding
+connections), it is the responsibility of the reverse tunnel protocol to
+indicate when the relayed connection has been established and also the identity
+of the client.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<div id="indicating-stand-by-for-incoming-connections">
+<section id="section-5.1">
+        <h3 id="name-indicating-stand-by-for-inc">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-indicating-stand-by-for-inc" class="section-name selfRef">Indicating Stand-by for Incoming Connections</a>
+        </h3>
+<p id="section-5.1-1">When a client acting as a transport-layer protocol relay receives a request to
+establish a reverse tunnel, the client <span class="bcp14">SHOULD</span> intially send an informational
+HTTP response of status code 100 (Continue), to indicate that the client is
+willing to serve as a tunnel but that no connections are immediately available
+to be relayed.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">Once a connection to be relayed becomes available, the client sends a successful
+response (i.e., 101 Switching Protocols or 200 OK depending on the version of
+the HTTP protocol being used) to indicate that the client has started to act as
+a relay.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+<p id="section-5.1-3">The client <span class="bcp14">MAY</span> send 100 responses more than once.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.1-4">If the client instantly matched a connection to be relayed to the tunnel
+establishment request, the client <span class="bcp14">MAY</span> omit the 100 response and send a
+successful response immediately.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="forwarding-client-address">
+<section id="section-5.2">
+        <h3 id="name-forwarding-client-address">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-forwarding-client-address" class="section-name selfRef">Forwarding Client Address</a>
+        </h3>
+<p id="section-5.2-1">When sending a successful HTTP response, clients <span class="bcp14">MAY</span> include the "Forwarded"
 header field <span>[<a href="#FORWARDED" class="cite xref">FORWARDED</a>]</span> in the HTTP response to indicate the client
 identity of the relayed connection. For clients acting as a transport-layer
 relay, use of the "Forwarded" response header field is the only way to relay the
-identity.<a href="#section-5-1" class="pilcrow">¶</a></p>
-<p id="section-5-2"><a href="#fig-client-address" class="auto internal xref">Figure 2</a> shows an HTTP/1.1 response conveying the client IP
-address of the connection being relayed.<a href="#section-5-2" class="pilcrow">¶</a></p>
-<span id="name-response-with-a-forwarded-h"></span><div id="fig-client-address">
+identity.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2"><a href="#fig-tcp-relay" class="auto internal xref">Figure 2</a> shows an exchange of HTTP/1.1 messages to establish a reverse
+TCP relay, with the final response indicating the client-side address of the
+connection being relayed.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<span id="name-establishing-a-tcp-relay"></span><div id="fig-tcp-relay">
 <figure id="figure-2">
-        <div class="alignLeft art-text artwork" id="section-5-3.1">
+          <div class="alignLeft art-text artwork" id="section-5.2-3.1">
 <pre>
+GET /reverse-tcp-relay HTTP/1.1
+Connection: upgrade
+Upgrade: reverse
+
+HTTP/1.1 100 Continue
+
 HTTP/1.1 101 Switching Protocols
 Connection: upgrade
 Upgrade: reverse
@@ -1320,15 +1364,17 @@ Forwarded: for=192.0.2.43
 </pre>
 </div>
 <figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
-<a href="#name-response-with-a-forwarded-h" class="selfRef">Response with a Forwarded Header Field</a>
-        </figcaption></figure>
+<a href="#name-establishing-a-tcp-relay" class="selfRef">Establishing a TCP relay</a>
+          </figcaption></figure>
 </div>
-<p id="section-5-4">When the client is an application-protocol relay, it <span class="bcp14">MAY</span> use the mechanism
+<p id="section-5.2-4">When the client is an application-protocol relay, it <span class="bcp14">MAY</span> use the mechanism
 provided by the application protocols to relay the identity of the client being
 relayed. For example, a client acting as a HTTP proxy can forward HTTP requests
 to servers at the HTTP request level, indicating the IP address of the HTTP
 clients by adding the Forwarded header field to each of the HTTP request that it
-forwards.<a href="#section-5-4" class="pilcrow">¶</a></p>
+forwards.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="application-layer-protocol-negotiation">
