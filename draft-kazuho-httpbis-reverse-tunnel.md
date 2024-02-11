@@ -182,6 +182,58 @@ the original HTTP clients by adding the "Forwarded" header field to each HTTP
 request it forwards.
 
 
+## Specifying the Listening Address and Port
+
+Clients acting as relays that allow servers specify the listening address or
+port SHOULD use the following URI Template {{!TEMPLATE=RFC6570}} to define the
+target URI on which they provide the service. Adopting this template simplifies
+operations by ensuring a uniform method for configuring endpoints. Examples are
+shown below:
+
+~~~
+https://example.com/.well-known/reverse/tcp/{listen_host}/{listen_port}/
+https://example.org/listen/to/tcp?h={listen_host}&p={listen_port}
+~~~
+
+Furthermore, the use of the default template is RECOMMENDED, which is defined as
+"https://$CLIENT_HOST:$CLIENT_PORT/.well-known/reverse/tcp/{listen_host}/{listen_port}/",
+where $CLIENT_HOST and $CLIENT_PORT are the host and port of the client.
+
+The "listen_host" variable specifies the listening address. The variable MAY
+contain an wildcard address.
+
+The "listen_port" variable specifies the listening port.
+
+The following requirements apply to the URI Template:
+
+* The URI Template MUST be a level 3 template or lower.
+
+* The URI Template MUST be in absolute form and MUST include non-empty scheme,
+  authority, and path components.
+
+* The path component of the URI Template MUST start with a slash ("/").
+
+* All template variables MUST be within the path or query components of the URI.
+
+* The URI template MUST contain the two variables "listen_host" and
+  "listen_port" and MAY contain other variables.
+
+* The URI Template MUST NOT contain any non-ASCII Unicode characters and MUST
+  only contain ASCII characters in the range 0x21-0x7E inclusive (note that
+  percent-encoding is allowed; see Section 2.1 of {{?URI=RFC3886}}).
+
+*  The URI Template MUST NOT use Reserved Expansion ("+" operator), Fragment
+   Expansion ("#" operator), Label Expansion with Dot-Prefix, Path Segment
+   Expansion with Slash-Prefix, nor Path-Style Parameter Expansion with
+   Semicolon-Prefix.
+
+Servers SHOULD validate the requirements above; however, servers MAY use a
+general-purpose URI Template implementation that lacks this specific validation.
+If a server detects that any of the requirements above are not met by a URI
+Template, the server MUST reject its configuration and abort the request without
+sending it to the relaying client.
+
+
 # Application-Layer Protocol Negotiation
 
 While TLS {{TLS}} can be used on top of an established tunnel, doing so might
