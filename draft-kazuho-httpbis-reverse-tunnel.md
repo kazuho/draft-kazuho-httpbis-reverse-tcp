@@ -108,8 +108,8 @@ Upgrade: reverse
 
 ## HTTP/2 and HTTP/3
 
-In HTTP/2 and HTTP/3, extended CONNECT is used ({{EXTENDED-CONNECT-H2}} or
-{{EXTENDED-CONNECT-H3}}).
+In HTTP/2 and HTTP/3, extended CONNECT is used; see {{EXTENDED-CONNECT-H2}} and
+{{EXTENDED-CONNECT-H3}}.
 
 In both HTTP versions, the method being used is "CONNECT" and the upgrade
 token is conveyed by the ":protocol" pseudo header. Once the reverse tunnel is
@@ -118,11 +118,11 @@ established successfully, the client responds with a 200 (OK) response.
 
 # Authentication
 
-When HTTPS is used for establishing the tunnel, the client (i.e., the node
-acting as the TLS {{?TLS=RFC8446}} server) SHOULD use one of the TLS-based
-authentication schemes to identify itself.
+When HTTPS is used for establishing the tunnel, clients (i.e., the nodes acting
+as TLS {{?TLS=RFC8446}} servers) SHOULD use one of the TLS-based authentication
+schemes to identify themselves.
 
-The server SHOULD authenticate itself either by using one of the HTTP-based
+Servers SHOULD authenticate themselves either by using one of the HTTP-based
 authentication schemes (e.g., HTTP Basic Authentication {{?BASIC-AUTH=RFC7617}})
 or by using one of the TLS-based authentication schemes when HTTPS is used.
 
