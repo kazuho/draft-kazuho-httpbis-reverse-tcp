@@ -262,12 +262,12 @@ Selected-ALPN: h2
 ~~~
 {: #fig-alpn-response title="Response with a Selected-ALPN Header Field"}
 
-When a server receives a successful HTTP response that does not carry the
-"Selected-ALPN" header field, it could either be an indication that the server
-chose another application protocol or that the server could not determine which
-application protocol has been chosen. Therefore, the client SHOULD NOT assume
-that an application protocol other than the ones being offered has been
-selected.
+When a server sends an HTTP request with an "ALPN" header field but receives a
+successful response without a "Selected-ALPN" header field, it could either be
+an indication that the client chose an application protocol that the server did
+not offer, or that the server could not determine which application protocol has
+been chosen. Therefore, the client SHOULD NOT assume that an application
+protocol other than the ones being offered has been selected.
 
 
 # IANA Considerations
