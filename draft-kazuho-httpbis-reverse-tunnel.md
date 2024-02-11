@@ -118,8 +118,8 @@ established successfully, the client responds with a 200 (OK) response.
 # Authentication
 
 When HTTPS is used for establishing the tunnel, the client (i.e., the node
-acting as the TLS server) SHOULD use one of the TLS-based authentication schemes
-to identify itself.
+acting as the TLS {{?TLS=RFC8446}} server) SHOULD use one of the TLS-based
+authentication schemes to identify itself.
 
 The server SHOULD authenticate itself either by using one of the HTTP-based
 authentication schemes (e.g., HTTP Basic Authentication {{?BASIC-AUTH=RFC7617}})
@@ -191,19 +191,25 @@ forwards.
 
 # Application-Layer Protocol Negotiation
 
-As the use of TLS {{?TLS=RFC8446}} becomes prevalent, an increasing number of
-application protocols depend on the Application-Layer Protocol Negotiation
-Extension {{!ALPN=RFC7301}} to determine the application protocol to utilize.
+While TLS {{TLS}} can be used on top of an established tunnel, doing so might
+not be necessary for ensuring the security of communication if the tunnel is
+established via HTTPS, and the client side of the reverse tunnel also functions
+as the client side of the application protocol in use. A typical scenario
+involves an HTTPS reverse proxy serving as the client of a reverse tunnel. This
+proxy terminates incoming TLS connections and decrypts the HTTP requests before
+forwarding them through the reverse tunnel, which is secured by a separate TLS
+connection.
 
-While TLS can be used on top of the established tunnel and the application
-protocol can be negotiated during the TLS handshake, doing so is not necessary
-to achieve the goal of encryption when the tunnel is established via HTTPS. When
-operating over HTTPS, some deployments could opt to exchange messages without
-having another layer of encryption above the tunnel.
+In these deployments, foregoing the use of TLS above the established tunnel can
+yield performance benefits without compromising security. However, this approach
+requires that endpoints negotiate the application protocol without relying on
+the Application-Layer Protocol Negotiation {{!ALPN=RFC7301}} performed during
+the TLS handshake.
 
-This document specifies an HTTP header-based mechanism for negotiating the
-application protocol. ALPN identifiers are used for naming the application
-protocols, so that existing application procotols can be selected.
+To address this need, this document introduces an HTTP header-based mechanism
+for negotiating the application protocol. It employs ALPN identifiers for naming
+the application protocols, allowing for the selection of existing application
+protocols without depending on TLS-based negotiation.
 
 
 ## Indicating Protocols Available for Use
