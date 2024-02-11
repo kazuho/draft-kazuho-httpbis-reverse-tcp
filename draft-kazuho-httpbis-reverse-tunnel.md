@@ -122,7 +122,35 @@ authentication schemes (e.g., HTTP Basic Authentication {{?BASIC-AUTH=RFC7617}})
 or by using one of the TLS-based authentication schemes when HTTPS is used.
 
 
-# Forwarding Client Address
+# Relaying Connections
+
+When the client is acting as a transport-layer protocol relay (i.e., forwarding
+connections), it is the responsibility of the reverse tunnel protocol to
+indicate when the relayed connection has been established and also the identity
+of the client.
+
+
+## Indicating Stand-by for Incoming Connections
+
+When a client acting as a transport-layer protocol relay receives a request to
+establish a reverse tunnel, the client SHOULD intially send an informational
+HTTP response of status code 100 (Continue), to indicate that the client is
+willing to serve as a tunnel but that no connections are immediately available
+to be relayed.
+
+Once a connection to be relayed becomes available, the client sends a successful
+response (i.e., 101 Switching Protocols or 200 OK depending on the version of
+the HTTP protocol being used) to indicate that the client has started to act as
+a relay.
+
+The client MAY send 100 responses more than once.
+
+If the client instantly matched a connection to be relayed to the tunnel
+establishment request, the client MAY omit the 100 response and send a
+successful response immediately.
+
+
+## Forwarding Client Address
 
 When sending a successful HTTP response, clients MAY include the "Forwarded"
 header field {{!FORWARDED=RFC7239}} in the HTTP response to indicate the client
@@ -130,17 +158,24 @@ identity of the relayed connection. For clients acting as a transport-layer
 relay, use of the "Forwarded" response header field is the only way to relay the
 identity.
 
-{{fig-client-address}} shows an HTTP/1.1 response conveying the client IP
-address of the connection being relayed.
+{{fig-tcp-relay}} shows an exchange of HTTP/1.1 messages to establish a reverse
+TCP relay, with the final response indicating the client-side address of the
+connection being relayed.
 
 ~~~
+GET /reverse-tcp-relay HTTP/1.1
+Connection: upgrade
+Upgrade: reverse
+
+HTTP/1.1 100 Continue
+
 HTTP/1.1 101 Switching Protocols
 Connection: upgrade
 Upgrade: reverse
 Forwarded: for=192.0.2.43
 
 ~~~
-{: #fig-client-address title="Response with a Forwarded Header Field"}
+{: #fig-tcp-relay title="Establishing a TCP relay"}
 
 When the client is an application-protocol relay, it MAY use the mechanism
 provided by the application protocols to relay the identity of the client being
