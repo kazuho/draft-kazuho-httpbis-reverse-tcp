@@ -1458,25 +1458,6 @@ protocols without depending on TLS-based negotiation.<a href="#section-6-3" clas
 server <span class="bcp14">MAY</span> include an "ALPN" header field <span>[<a href="#ALPN-HEADER" class="cite xref">ALPN-HEADER</a>]</span> in the HTTP
 request that it issues. The "ALPN" header field carries a list of
 application-protocol identifies that the server is willing to use.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.1-2"><a href="#fig-alpn-request" class="auto internal xref">Figure 3</a> shows an HTTP/1.1 request attempting to establish a reverse
-channel that uses either HTTP/2 <span>[<a href="#HTTP2" class="cite xref">HTTP2</a>]</span> or HTTP/1.1
-<span>[<a href="#HTTP1" class="cite xref">HTTP1</a>]</span> as the application protocol.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
-<span id="name-request-with-an-alpn-header"></span><div id="fig-alpn-request">
-<figure id="figure-3">
-          <div class="alignLeft art-text artwork" id="section-6.1-3.1">
-<pre>
-GET /reverse-endpoint HTTP/1.1
-Host: example.com
-Connection: upgrade
-Upgrade: reverse
-ALPN: h2, http%2F1.1
-
-</pre>
-</div>
-<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
-<a href="#name-request-with-an-alpn-header" class="selfRef">Request with an ALPN Header Field</a>
-          </figcaption></figure>
-</div>
 </section>
 </div>
 <div id="indicating-the-chosen-protocol">
@@ -1497,12 +1478,19 @@ application-protocol identifier that is being chosen.<a href="#section-6.2-3" cl
 Selected-ALPN = ALPN
 </pre><a href="#section-6.2-4" class="pilcrow">¶</a>
 </div>
-<p id="section-6.2-5"><a href="#fig-alpn-response" class="auto internal xref">Figure 4</a> shows an HTTP/1.1 response indicating that the tunnel has
-been established with the chosen protocol being HTTP/2.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
-<span id="name-response-with-a-selected-al"></span><div id="fig-alpn-response">
-<figure id="figure-4">
+<p id="section-6.2-5"><a href="#fig-alpn-request" class="auto internal xref">Figure 3</a> shows an exchange of HTTP/1.1 response and response that
+sets up a tunnel for forwarding HTTP requests using HTTP/2, where tunnel server
+is the origin and the tunnel client is the reverse proxy.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
+<span id="name-setting-up-a-http-2-tunnel-"></span><div id="fig-alpn-request">
+<figure id="figure-3">
           <div class="alignLeft art-text artwork" id="section-6.2-6.1">
 <pre>
+GET /reverse-connect/proxy/for/service/X HTTP/1.1
+Host: example.com
+Connection: upgrade
+Upgrade: reverse
+ALPN: h2, http%2F1.1
+
 HTTP/1.1 101 Switching Protocols
 Connection: upgrade
 Upgrade: reverse
@@ -1510,8 +1498,8 @@ Selected-ALPN: h2
 
 </pre>
 </div>
-<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
-<a href="#name-response-with-a-selected-al" class="selfRef">Response with a Selected-ALPN Header Field</a>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-setting-up-a-http-2-tunnel-" class="selfRef">Setting up a HTTP/2 Tunnel for forwarding HTTP Requests</a>
           </figcaption></figure>
 </div>
 <p id="section-6.2-7">When a server sends an HTTP request with an "ALPN" header field but receives a
@@ -1590,14 +1578,6 @@ protocol other than the ones being offered has been selected.<a href="#section-6
 <dt id="BASIC-AUTH">[BASIC-AUTH]</dt>
         <dd>
 <span class="refAuthor">Reschke, J.</span>, <span class="refTitle">"The 'Basic' HTTP Authentication Scheme"</span>, <span class="seriesInfo">RFC 7617</span>, <span class="seriesInfo">DOI 10.17487/RFC7617</span>, <time datetime="2015-09" class="refDate">September 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7617">https://www.rfc-editor.org/rfc/rfc7617</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="HTTP1">[HTTP1]</dt>
-        <dd>
-<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP/1.1"</span>, <span class="seriesInfo">STD 99</span>, <span class="seriesInfo">RFC 9112</span>, <span class="seriesInfo">DOI 10.17487/RFC9112</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9112">https://www.rfc-editor.org/rfc/rfc9112</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="HTTP2">[HTTP2]</dt>
-        <dd>
-<span class="refAuthor">Thomson, M., Ed.</span> and <span class="refAuthor">C. Benfield, Ed.</span>, <span class="refTitle">"HTTP/2"</span>, <span class="seriesInfo">RFC 9113</span>, <span class="seriesInfo">DOI 10.17487/RFC9113</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9113">https://www.rfc-editor.org/rfc/rfc9113</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="TLS">[TLS]</dt>
         <dd>
