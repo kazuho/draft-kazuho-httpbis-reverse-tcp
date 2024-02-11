@@ -216,7 +216,7 @@ Table of Contents
    Figure 2 illustrates an exchange of HTTP/1.1 messages to establish a
    reverse TCP relay.
 
-   GET /.well-known/reverse/tcp/0.0.0.0/443/ HTTP/1.1
+   GET /.well-known/reverse/tcp/0.0.0.0/25/ HTTP/1.1
    Host: example.com
    Connection: upgrade
    Upgrade: reverse
@@ -228,7 +228,7 @@ Table of Contents
    Upgrade: reverse
    Forwarded: for=192.0.2.43
 
-                     Figure 2: Establishing a TCP relay
+                Figure 2: Establishing a TCP relay for SMTP
 
    When the client is forwarding at the application protocol layer,
    rather than relaying the bytes exchanged on the transport, the client

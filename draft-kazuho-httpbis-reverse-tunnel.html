@@ -1336,11 +1336,11 @@ tunnel establishment request, the client <span class="bcp14">MAY</span> omit the
 and directly send a successful response.<a href="#section-5-6" class="pilcrow">¶</a></p>
 <p id="section-5-7"><a href="#fig-tcp-relay" class="auto internal xref">Figure 2</a> illustrates an exchange of HTTP/1.1 messages to establish a
 reverse TCP relay.<a href="#section-5-7" class="pilcrow">¶</a></p>
-<span id="name-establishing-a-tcp-relay"></span><div id="fig-tcp-relay">
+<span id="name-establishing-a-tcp-relay-fo"></span><div id="fig-tcp-relay">
 <figure id="figure-2">
         <div class="alignLeft art-text artwork" id="section-5-8.1">
 <pre>
-GET /.well-known/reverse/tcp/0.0.0.0/443/ HTTP/1.1
+GET /.well-known/reverse/tcp/0.0.0.0/25/ HTTP/1.1
 Host: example.com
 Connection: upgrade
 Upgrade: reverse
@@ -1355,7 +1355,7 @@ Forwarded: for=192.0.2.43
 </pre>
 </div>
 <figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
-<a href="#name-establishing-a-tcp-relay" class="selfRef">Establishing a TCP relay</a>
+<a href="#name-establishing-a-tcp-relay-fo" class="selfRef">Establishing a TCP relay for SMTP</a>
         </figcaption></figure>
 </div>
 <p id="section-5-9">When the client is forwarding at the application protocol layer, rather than
