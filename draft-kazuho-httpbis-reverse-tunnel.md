@@ -53,8 +53,8 @@ and port number, enhancing flexibility and integration with web technologies.
 
 As servers specify their clients using URIs, only clients known to a server can
 communicate directly with it. However, clients can act as relays, forwarding TCP
-connections from the Internet to the servers connected through the reverse
-tunnel.
+connections or application-level messages (e.g., HTTP requests) from the
+Internet to the servers connected through the reverse tunnel.
 
 
 # Conventions and Definitions
