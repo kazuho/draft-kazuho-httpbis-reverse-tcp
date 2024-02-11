@@ -123,9 +123,11 @@ or by using one of the TLS-based authentication schemes when HTTPS is used.
 
 # Forwarding Client Address
 
-When the client is acting as a TCP relay, it MAY include the "Forwarded" header
-field {{!FORWARDED=RFC7239}} in the HTTP response it sends, to indicate the
-client identity of the relayed connection.
+When sending a successful HTTP response, clients MAY include the "Forwarded"
+header field {{!FORWARDED=RFC7239}} in the HTTP response to indicate the client
+identity of the relayed connection. For clients acting as a transport-layer
+relay, use of the "Forwarded" response header field is the only way to relay the
+identity.
 
 {{fig-client-address}} shows an HTTP/1.1 response conveying the client IP
 address of the connection being relayed.
@@ -138,6 +140,14 @@ Forwarded: for=192.0.2.43
 
 ~~~
 {: #fig-client-address title="Response with a Forwarded Header Field"}
+
+When the client is an application-protocol relay, it MAY use the mechanism
+provided by the application protocols to relay the identity of the client being
+relayed. For example, a client acting as a HTTP proxy can forward HTTP requests
+to servers at the HTTP request level, indicating the IP address of the HTTP
+clients by adding the Forwarded header field to each of the HTTP request that it
+forwards.
+
 
 # Application-Layer Protocol Negotiation
 
