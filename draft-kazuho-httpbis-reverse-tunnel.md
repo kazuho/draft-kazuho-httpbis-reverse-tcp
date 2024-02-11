@@ -158,7 +158,7 @@ and directly send a successful response.
 reverse TCP relay.
 
 ~~~
-GET /.well-known/reverse/tcp/0.0.0.0/443/ HTTP/1.1
+GET /.well-known/reverse/tcp/0.0.0.0/25/ HTTP/1.1
 Host: example.com
 Connection: upgrade
 Upgrade: reverse
@@ -171,7 +171,7 @@ Upgrade: reverse
 Forwarded: for=192.0.2.43
 
 ~~~
-{: #fig-tcp-relay title="Establishing a TCP relay"}
+{: #fig-tcp-relay title="Establishing a TCP relay for SMTP"}
 
 When the client is forwarding at the application protocol layer, rather than
 relaying the bytes exchanged on the transport, the client MAY use mechanisms
