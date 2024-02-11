@@ -95,6 +95,7 @@ establishing a reverse tunnel.
 
 ~~~
 GET /reverse-endpoint HTTP/1.1
+Host: example.com
 Connection: upgrade
 Upgrade: reverse
 
@@ -158,6 +159,7 @@ reverse TCP relay.
 
 ~~~
 GET /reverse-tcp-relay HTTP/1.1
+Host: example.com
 Connection: upgrade
 Upgrade: reverse
 
@@ -216,6 +218,7 @@ channel that uses either HTTP/2 {{?HTTP2=RFC9113}} or HTTP/1.1
 
 ~~~
 GET /reverse-endpoint HTTP/1.1
+Host: example.com
 Connection: upgrade
 Upgrade: reverse
 ALPN: h2, http%2F1.1
