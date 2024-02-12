@@ -158,7 +158,7 @@ and directly send a successful response.
 reverse TCP relay.
 
 ~~~
-GET /.well-known/reverse/tcp/0.0.0.0/25/ HTTP/1.1
+GET /.well-known/listen-tcp/0.0.0.0/25/ HTTP/1.1
 Host: example.com
 Connection: upgrade
 Upgrade: reverse
@@ -311,7 +311,60 @@ protocol other than the ones being offered has been selected.
 
 # IANA Considerations
 
-TBD.
+Once approved, this document will request IANA to register the following entries
+to the respective registries.
+
+To the "HTTP Upgrade Tokens" registry maintained at
+<https://www.iana.org/assignments/http-upgrade-tokens>:
+
+Value:
+: reverse
+
+Description:
+: Reverse Tunnel
+
+Expected Version Tokens:
+: None
+
+Reference:
+: this document
+
+To the "Hypertext Transfer Protocol (HTTP) Field Name Registry" maintained at
+<https://www.iana.org/assignments/http-fields>:
+
+Field Name:
+: Selected-ALPN
+
+Template:
+: None
+
+Status:
+: permanent
+
+Reference:
+: this document
+
+Comments:
+: None
+
+To the "Well-Known URIs" registry maintained at
+<https://www.iana.org/assignments/well-known-uris>:
+
+URI Suffix:
+: listen-tcp
+
+Change Controller:
+: IETF
+
+Reference:
+: this document
+
+Status:
+: permanent
+
+Related Information:
+: Includes all resources identified with the path prefix
+"./well-known/listen-tcp/".
 
 
 --- back
