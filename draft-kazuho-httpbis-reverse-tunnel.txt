@@ -105,14 +105,14 @@ Table of Contents
    method in HTTP/2 [EXTENDED-CONNECT-H2] and HTTP/3
    [EXTENDED-CONNECT-H3] for the establishment of these byte streams.
 
-   Beyond the reduced performance overhead in comparison to VPNs, this
-   method of employing HTTP for tunnel establishment offers additional
-   benefits.  It enables endpoints to utilize a variety of
-   authentication schemes that are native to HTTP, such as HTTP
-   authentication and cookies.  Furthermore, it shifts client
-   identification from relying on IP addresses and port numbers to using
-   URIs, thereby enhancing flexibility and integration with web
-   technologies.
+   Beyond better manageability and reduced performance overhead in
+   comparison to VPNs, this method of employing HTTP for tunnel
+   establishment provides additional advantages.  It enables endpoints
+   to utilize a variety of authentication schemes that are native to
+   HTTP, such as HTTP authentication and cookies.  Furthermore, it
+   shifts client identification from relying on IP addresses and port
+   numbers to using URIs, thereby enhancing flexibility and integration
+   with web technologies.
 
    As servers specify their clients using URIs, only clients known to a
    server can communicate directly with it.  Nevertheless, clients have

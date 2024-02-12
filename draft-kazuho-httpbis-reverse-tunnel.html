@@ -1215,12 +1215,12 @@ extension employs HTTP upgrades in HTTP/1.1 (<span>[<a href="#HTTP-SEMANTICS" cl
 the "extended CONNECT" method in HTTP/2 <span>[<a href="#EXTENDED-CONNECT-H2" class="cite xref">EXTENDED-CONNECT-H2</a>]</span> and
 HTTP/3 <span>[<a href="#EXTENDED-CONNECT-H3" class="cite xref">EXTENDED-CONNECT-H3</a>]</span> for the establishment of these byte
 streams.<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4">Beyond the reduced performance overhead in comparison to VPNs, this method of
-employing HTTP for tunnel establishment offers additional benefits. It enables
-endpoints to utilize a variety of authentication schemes that are native to
-HTTP, such as HTTP authentication and cookies. Furthermore, it shifts client
-identification from relying on IP addresses and port numbers to using URIs,
-thereby enhancing flexibility and integration with web technologies.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-4">Beyond better manageability and reduced performance overhead in comparison to
+VPNs, this method of employing HTTP for tunnel establishment provides additional
+advantages. It enables endpoints to utilize a variety of authentication schemes
+that are native to HTTP, such as HTTP authentication and cookies. Furthermore,
+it shifts client identification from relying on IP addresses and port numbers to
+using URIs, thereby enhancing flexibility and integration with web technologies.<a href="#section-1-4" class="pilcrow">¶</a></p>
 <p id="section-1-5">As servers specify their clients using URIs, only clients known to a server can
 communicate directly with it. Nevertheless, clients have the capability to act
 as relays, forwarding TCP connections or application-level messages (e.g., HTTP
