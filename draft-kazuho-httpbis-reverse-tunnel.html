@@ -1261,7 +1261,8 @@ used.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 reverse tunnel is established successfully, the client responds with a 101
 (Swithing Protocols) response.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
 <p id="section-3.1-4"><a href="#fig-tunnel-establishment" class="auto internal xref">Figure 1</a> shows an exchange of HTTP/1.1 request and response
-establishing a reverse tunnel.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+establishing a reverse tunnel. In this example, the Basic HTTP Authentication
+Scheme <span>[<a href="#BASIC-AUTH" class="cite xref">BASIC-AUTH</a>]</span> is used to authenticate the server.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
 <span id="name-establishing-reverse-tunnel"></span><div id="fig-tunnel-establishment">
 <figure id="figure-1">
           <div class="alignLeft art-text artwork" id="section-3.1-5.1">
@@ -1270,6 +1271,7 @@ GET /reverse-endpoint HTTP/1.1
 Host: example.com
 Connection: upgrade
 Upgrade: reverse
+Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
 
 HTTP/1.1 101 Switching Protocols
 Connection: upgrade
@@ -1306,8 +1308,9 @@ established successfully, the client responds with a 200 (OK) response.<a href="
 as TLS <span>[<a href="#TLS" class="cite xref">TLS</a>]</span> servers) <span class="bcp14">SHOULD</span> use one of the TLS-based authentication
 schemes to identify themselves.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <p id="section-4-2">Servers <span class="bcp14">SHOULD</span> authenticate themselves either by using one of the HTTP-based
-authentication schemes (e.g., HTTP Basic Authentication <span>[<a href="#BASIC-AUTH" class="cite xref">BASIC-AUTH</a>]</span>)
-or by using one of the TLS-based authentication schemes when HTTPS is used.<a href="#section-4-2" class="pilcrow">¶</a></p>
+authentication schemes; e.g., HTTP Authentication (<span>[<a href="#HTTP-SEMANTICS" class="cite xref">HTTP-SEMANTICS</a>]</span>
+Section 11), or, when HTTPS is used, by using one of the TLS-based
+authentication schemes.<a href="#section-4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="relaying-connections">
@@ -1344,6 +1347,7 @@ GET /.well-known/listen-tcp/0.0.0.0/25/ HTTP/1.1
 Host: example.com
 Connection: upgrade
 Upgrade: reverse
+Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
 
 HTTP/1.1 100 Continue
 
@@ -1489,6 +1493,7 @@ GET /reverse-connect/proxy/for/service/X HTTP/1.1
 Host: example.com
 Connection: upgrade
 Upgrade: reverse
+Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
 ALPN: h2, http%2F1.1
 
 HTTP/1.1 101 Switching Protocols

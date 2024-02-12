@@ -151,12 +151,15 @@ Table of Contents
    with a 101 (Swithing Protocols) response.
 
    Figure 1 shows an exchange of HTTP/1.1 request and response
-   establishing a reverse tunnel.
+   establishing a reverse tunnel.  In this example, the Basic HTTP
+   Authentication Scheme [BASIC-AUTH] is used to authenticate the
+   server.
 
    GET /reverse-endpoint HTTP/1.1
    Host: example.com
    Connection: upgrade
    Upgrade: reverse
+   Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
 
    HTTP/1.1 101 Switching Protocols
    Connection: upgrade
@@ -181,9 +184,9 @@ Table of Contents
    authentication schemes to identify themselves.
 
    Servers SHOULD authenticate themselves either by using one of the
-   HTTP-based authentication schemes (e.g., HTTP Basic Authentication
-   [BASIC-AUTH]) or by using one of the TLS-based authentication schemes
-   when HTTPS is used.
+   HTTP-based authentication schemes; e.g., HTTP Authentication
+   ([HTTP-SEMANTICS] Section 11), or, when HTTPS is used, by using one
+   of the TLS-based authentication schemes.
 
 5.  Relaying Connections
 
@@ -220,6 +223,7 @@ Table of Contents
    Host: example.com
    Connection: upgrade
    Upgrade: reverse
+   Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
 
    HTTP/1.1 100 Continue
 
@@ -350,6 +354,7 @@ https://example.org/listen/to/tcp?h={listen_host}&p={listen_port}
    Host: example.com
    Connection: upgrade
    Upgrade: reverse
+   Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
    ALPN: h2, http%2F1.1
 
    HTTP/1.1 101 Switching Protocols
