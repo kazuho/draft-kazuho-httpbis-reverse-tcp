@@ -91,13 +91,15 @@ reverse tunnel is established successfully, the client responds with a 101
 (Swithing Protocols) response.
 
 {{fig-tunnel-establishment}} shows an exchange of HTTP/1.1 request and response
-establishing a reverse tunnel.
+establishing a reverse tunnel. In this example, the Basic HTTP Authentication
+Scheme {{?BASIC-AUTH=RFC7617}} is used to authenticate the server.
 
 ~~~
 GET /reverse-endpoint HTTP/1.1
 Host: example.com
 Connection: upgrade
 Upgrade: reverse
+Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
 
 HTTP/1.1 101 Switching Protocols
 Connection: upgrade
@@ -123,8 +125,9 @@ as TLS {{?TLS=RFC8446}} servers) SHOULD use one of the TLS-based authentication
 schemes to identify themselves.
 
 Servers SHOULD authenticate themselves either by using one of the HTTP-based
-authentication schemes (e.g., HTTP Basic Authentication {{?BASIC-AUTH=RFC7617}})
-or by using one of the TLS-based authentication schemes when HTTPS is used.
+authentication schemes; e.g., HTTP Authentication ({{HTTP-SEMANTICS}}
+Section 11), or, when HTTPS is used, by using one of the TLS-based
+authentication schemes.
 
 
 # Relaying Connections
@@ -162,6 +165,7 @@ GET /.well-known/listen-tcp/0.0.0.0/25/ HTTP/1.1
 Host: example.com
 Connection: upgrade
 Upgrade: reverse
+Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
 
 HTTP/1.1 100 Continue
 
@@ -291,6 +295,7 @@ GET /reverse-connect/proxy/for/service/X HTTP/1.1
 Host: example.com
 Connection: upgrade
 Upgrade: reverse
+Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
 ALPN: h2, http%2F1.1
 
 HTTP/1.1 101 Switching Protocols
