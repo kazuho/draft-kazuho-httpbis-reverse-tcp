@@ -420,6 +420,10 @@ https://example.org/listen/to/tcp?h={listen_host}&p={listen_port}
               DOI 10.17487/RFC6570, March 2012,
               <https://www.rfc-editor.org/rfc/rfc6570>.
 
+   [URI]      Allman, E., "An Extensible Message Format for Message
+              Tracking Responses", RFC 3886, DOI 10.17487/RFC3886,
+              September 2004, <https://www.rfc-editor.org/rfc/rfc3886>.
+
 8.2.  Informative References
 
    [BASIC-AUTH]
@@ -437,10 +441,6 @@ https://example.org/listen/to/tcp?h={listen_host}&p={listen_port}
    [TLS]      Rescorla, E., "The Transport Layer Security (TLS) Protocol
               Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
               <https://www.rfc-editor.org/rfc/rfc8446>.
-
-   [URI]      Allman, E., "An Extensible Message Format for Message
-              Tracking Responses", RFC 3886, DOI 10.17487/RFC3886,
-              September 2004, <https://www.rfc-editor.org/rfc/rfc3886>.
 
 Acknowledgments
 
