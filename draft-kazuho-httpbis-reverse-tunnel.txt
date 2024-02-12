@@ -97,28 +97,29 @@ Table of Contents
    manageability and incurs performance penalties due to the additional
    routing and encapsulation involved.
 
-   This document proposes an alternative method.
+   This document proposes an alternative to utilizing VPNs by defining a
+   method for servers to establish connections to clients over HTTP,
+   thereby creating bi-directional byte streams for application
+   protocols.  Specifically, this extension employs HTTP upgrades in
+   HTTP/1.1 ([HTTP-SEMANTICS] Section 7.8) and the "extended CONNECT"
+   method in HTTP/2 [EXTENDED-CONNECT-H2] and HTTP/3
+   [EXTENDED-CONNECT-H3] for the establishment of these byte streams.
 
-   Instead of utilizing VPNs, it describes how servers establish
-   connections to clients over HTTP to create bi-directional byte
-   streams for applications to exchange information.  Specifically, this
-   protocol leverages HTTP upgrades in HTTP/1.1 ([HTTP-SEMANTICS]
-   Section 7.8) or the "extended CONNECT" method of HTTP/2
-   ([EXTENDED-CONNECT-H2]) and HTTP/3 ([EXTENDED-CONNECT-H3]) to
-   establish connections.
-
-   Employing HTTP for connection establishment offers additional
-   benefits.  Beyond TLS-based authentication schemes, servers can
-   authenticate themselves using varios HTTP-provided authentication
-   schemes, such as HTTP authentication and cookies.  Furthermore,
-   clients are identified by URI rather than by IP address and port
-   number, enhancing flexibility and integration with web technologies.
+   Beyond the reduced performance overhead in comparison to VPNs, this
+   method of employing HTTP for tunnel establishment offers additional
+   benefits.  It enables endpoints to utilize a variety of
+   authentication schemes that are native to HTTP, such as HTTP
+   authentication and cookies.  Furthermore, it shifts client
+   identification from relying on IP addresses and port numbers to using
+   URIs, thereby enhancing flexibility and integration with web
+   technologies.
 
    As servers specify their clients using URIs, only clients known to a
-   server can communicate directly with it.  However, clients can act as
-   relays, forwarding TCP connections or application-level messages
-   (e.g., HTTP requests) that they accept or receive from the Internet
-   to the servers connected through the reverse tunnel.
+   server can communicate directly with it.  Nevertheless, clients have
+   the capability to act as relays, forwarding TCP connections or
+   application-level messages (e.g., HTTP requests) that they accept or
+   receive from the Internet to the servers connected through the
+   reverse tunnel.
 
 2.  Conventions and Definitions
 
