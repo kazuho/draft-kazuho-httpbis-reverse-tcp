@@ -319,4 +319,5 @@ TBD.
 # Acknowledgments
 {:numbered="false"}
 
-TODO acknowledge.
+This document is inspired by {{?I-D.bt-httpbis-reverse-http-01}} and the
+discussion at IETF 118.
