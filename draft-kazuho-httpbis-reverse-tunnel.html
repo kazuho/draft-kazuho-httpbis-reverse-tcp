@@ -1340,7 +1340,7 @@ reverse TCP relay.<a href="#section-5-7" class="pilcrow">¶</a></p>
 <figure id="figure-2">
         <div class="alignLeft art-text artwork" id="section-5-8.1">
 <pre>
-GET /.well-known/reverse/tcp/0.0.0.0/25/ HTTP/1.1
+GET /.well-known/listen-tcp/0.0.0.0/25/ HTTP/1.1
 Host: example.com
 Connection: upgrade
 Upgrade: reverse
@@ -1517,7 +1517,91 @@ protocol other than the ones being offered has been selected.<a href="#section-6
       <h2 id="name-iana-considerations">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-7-1">TBD.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-1">Once approved, this document will request IANA to register the following entries
+to the respective registries.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">To the "HTTP Upgrade Tokens" registry maintained at
+<a href="https://www.iana.org/assignments/http-upgrade-tokens">https://www.iana.org/assignments/http-upgrade-tokens</a>:<a href="#section-7-2" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7-3">
+        <dt id="section-7-3.1">Value:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-3.2">
+          <p id="section-7-3.2.1">reverse<a href="#section-7-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-3.3">Description:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-3.4">
+          <p id="section-7-3.4.1">Reverse Tunnel<a href="#section-7-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-3.5">Expected Version Tokens:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-3.6">
+          <p id="section-7-3.6.1">None<a href="#section-7-3.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-3.7">Reference:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-3.8">
+          <p id="section-7-3.8.1">this document<a href="#section-7-3.8.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+<p id="section-7-4">To the "Hypertext Transfer Protocol (HTTP) Field Name Registry" maintained at
+<a href="https://www.iana.org/assignments/http-fields">https://www.iana.org/assignments/http-fields</a>:<a href="#section-7-4" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7-5">
+        <dt id="section-7-5.1">Field Name:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-5.2">
+          <p id="section-7-5.2.1">Selected-ALPN<a href="#section-7-5.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-5.3">Template:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-5.4">
+          <p id="section-7-5.4.1">None<a href="#section-7-5.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-5.5">Status:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-5.6">
+          <p id="section-7-5.6.1">permanent<a href="#section-7-5.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-5.7">Reference:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-5.8">
+          <p id="section-7-5.8.1">this document<a href="#section-7-5.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-5.9">Comments:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-5.10">
+          <p id="section-7-5.10.1">None<a href="#section-7-5.10.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+<p id="section-7-6">To the "Well-Known URIs" registry maintained at
+<a href="https://www.iana.org/assignments/well-known-uris">https://www.iana.org/assignments/well-known-uris</a>:<a href="#section-7-6" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7-7">
+        <dt id="section-7-7.1">URI Suffix:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-7.2">
+          <p id="section-7-7.2.1">listen-tcp<a href="#section-7-7.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-7.3">Change Controller:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-7.4">
+          <p id="section-7-7.4.1">IETF<a href="#section-7-7.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-7.5">Reference:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-7.6">
+          <p id="section-7-7.6.1">this document<a href="#section-7-7.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-7.7">Status:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-7.8">
+          <p id="section-7-7.8.1">permanent<a href="#section-7-7.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-7.9">Related Information:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-7.10">
+          <p id="section-7-7.10.1">Includes all resources identified with the path prefix
+"./well-known/listen-tcp/".<a href="#section-7-7.10.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
 </section>
 </div>
 <section id="section-8">

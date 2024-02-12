@@ -216,7 +216,7 @@ Table of Contents
    Figure 2 illustrates an exchange of HTTP/1.1 messages to establish a
    reverse TCP relay.
 
-   GET /.well-known/reverse/tcp/0.0.0.0/25/ HTTP/1.1
+   GET /.well-known/listen-tcp/0.0.0.0/25/ HTTP/1.1
    Host: example.com
    Connection: upgrade
    Upgrade: reverse
@@ -369,7 +369,49 @@ https://example.org/listen/to/tcp?h={listen_host}&p={listen_port}
 
 7.  IANA Considerations
 
-   TBD.
+   Once approved, this document will request IANA to register the
+   following entries to the respective registries.
+
+   To the "HTTP Upgrade Tokens" registry maintained at
+   https://www.iana.org/assignments/http-upgrade-tokens
+   (https://www.iana.org/assignments/http-upgrade-tokens):
+
+   Value:  reverse
+
+   Description:  Reverse Tunnel
+
+   Expected Version Tokens:  None
+
+   Reference:  this document
+
+   To the "Hypertext Transfer Protocol (HTTP) Field Name Registry"
+   maintained at https://www.iana.org/assignments/http-fields
+   (https://www.iana.org/assignments/http-fields):
+
+   Field Name:  Selected-ALPN
+
+   Template:  None
+
+   Status:  permanent
+
+   Reference:  this document
+
+   Comments:  None
+
+   To the "Well-Known URIs" registry maintained at
+   https://www.iana.org/assignments/well-known-uris
+   (https://www.iana.org/assignments/well-known-uris):
+
+   URI Suffix:  listen-tcp
+
+   Change Controller:  IETF
+
+   Reference:  this document
+
+   Status:  permanent
+
+   Related Information:  Includes all resources identified with the path
+      prefix "./well-known/listen-tcp/".
 
 8.  References
 
