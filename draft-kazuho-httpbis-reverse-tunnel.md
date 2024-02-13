@@ -203,7 +203,7 @@ Furthermore, the use of the default template is RECOMMENDED, which is defined as
 "https://$CLIENT_HOST:$CLIENT_PORT/.well-known/reverse/tcp/{listen_host}/{listen_port}/",
 where $CLIENT_HOST and $CLIENT_PORT are the host and port of the client.
 
-The "listen_host" variable specifies the listening address. The variable MAY
+The "listen_host" variable specifies the listening address. This variable MAY
 contain an wildcard address.
 
 The "listen_port" variable specifies the listening port.
@@ -220,11 +220,11 @@ The following requirements apply to the URI Template:
 * All template variables MUST be within the path or query components of the URI.
 
 * The URI template MUST contain the two variables "listen_host" and
-  "listen_port" and MAY contain other variables.
+  "listen_port", and MAY contain other variables.
 
 * The URI Template MUST NOT contain any non-ASCII Unicode characters and MUST
   only contain ASCII characters in the range 0x21-0x7E inclusive (note that
-  percent-encoding is allowed; see Section 2.1 of {{!URI=RFC3886}}).
+  percent-encoding is allowed; see {{!URI=RFC3886}} Section 2.1).
 
 *  The URI Template MUST NOT use Reserved Expansion ("+" operator), Fragment
    Expansion ("#" operator), Label Expansion with Dot-Prefix, Path Segment
