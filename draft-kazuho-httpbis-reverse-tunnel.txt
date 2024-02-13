@@ -4,8 +4,8 @@
 
 httpbis                                                           K. Oku
 Internet-Draft                                                    Fastly
-Intended status: Standards Track                        12 February 2024
-Expires: 15 August 2024
+Intended status: Standards Track                        13 February 2024
+Expires: 16 August 2024
 
 
                         Reverse Tunnel over HTTP
@@ -46,7 +46,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 15 August 2024.
+   This Internet-Draft will expire on 16 August 2024.
 
 Copyright Notice
 
@@ -260,7 +260,7 @@ https://example.org/listen/to/tcp?h={listen_host}&p={listen_port}
    tcp/{listen_host}/{listen_port}/", where $CLIENT_HOST and
    $CLIENT_PORT are the host and port of the client.
 
-   The "listen_host" variable specifies the listening address.  The
+   The "listen_host" variable specifies the listening address.  This
    variable MAY contain an wildcard address.
 
    The "listen_port" variable specifies the listening port.
@@ -279,12 +279,12 @@ https://example.org/listen/to/tcp?h={listen_host}&p={listen_port}
       of the URI.
 
    *  The URI template MUST contain the two variables "listen_host" and
-      "listen_port" and MAY contain other variables.
+      "listen_port", and MAY contain other variables.
 
    *  The URI Template MUST NOT contain any non-ASCII Unicode characters
       and MUST only contain ASCII characters in the range 0x21-0x7E
-      inclusive (note that percent-encoding is allowed; see Section 2.1
-      of [URI]).
+      inclusive (note that percent-encoding is allowed; see [URI]
+      Section 2.1).
 
    *  The URI Template MUST NOT use Reserved Expansion ("+" operator),
       Fragment Expansion ("#" operator), Label Expansion with Dot-

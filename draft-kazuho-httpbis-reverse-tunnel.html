@@ -1034,7 +1034,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Oku</td>
-<td class="center">Expires 15 August 2024</td>
+<td class="center">Expires 16 August 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1047,12 +1047,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-kazuho-httpbis-reverse-tunnel-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-02-12" class="published">12 February 2024</time>
+<time datetime="2024-02-13" class="published">13 February 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-08-15">15 August 2024</time></dd>
+<dd class="expires"><time datetime="2024-08-16">16 August 2024</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1102,7 +1102,7 @@ proxies.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 15 August 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 16 August 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1389,7 +1389,7 @@ https://example.org/listen/to/tcp?h={listen_host}&amp;p={listen_port}
 <p id="section-5.1-3">Furthermore, the use of the default template is <span class="bcp14">RECOMMENDED</span>, which is defined as
 "https://$CLIENT_HOST:$CLIENT_PORT/.well-known/reverse/tcp/{listen_host}/{listen_port}/",
 where $CLIENT_HOST and $CLIENT_PORT are the host and port of the client.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
-<p id="section-5.1-4">The "listen_host" variable specifies the listening address. The variable <span class="bcp14">MAY</span>
+<p id="section-5.1-4">The "listen_host" variable specifies the listening address. This variable <span class="bcp14">MAY</span>
 contain an wildcard address.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
 <p id="section-5.1-5">The "listen_port" variable specifies the listening port.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
 <p id="section-5.1-6">The following requirements apply to the URI Template:<a href="#section-5.1-6" class="pilcrow">¶</a></p>
@@ -1409,12 +1409,12 @@ authority, and path components.<a href="#section-5.1-7.2.1" class="pilcrow">¶</
 </li>
           <li class="normal" id="section-5.1-7.5">
             <p id="section-5.1-7.5.1">The URI template <span class="bcp14">MUST</span> contain the two variables "listen_host" and
-"listen_port" and <span class="bcp14">MAY</span> contain other variables.<a href="#section-5.1-7.5.1" class="pilcrow">¶</a></p>
+"listen_port", and <span class="bcp14">MAY</span> contain other variables.<a href="#section-5.1-7.5.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.1-7.6">
             <p id="section-5.1-7.6.1">The URI Template <span class="bcp14">MUST NOT</span> contain any non-ASCII Unicode characters and <span class="bcp14">MUST</span>
 only contain ASCII characters in the range 0x21-0x7E inclusive (note that
-percent-encoding is allowed; see Section 2.1 of <span>[<a href="#URI" class="cite xref">URI</a>]</span>).<a href="#section-5.1-7.6.1" class="pilcrow">¶</a></p>
+percent-encoding is allowed; see <span>[<a href="#URI" class="cite xref">URI</a>]</span> Section 2.1).<a href="#section-5.1-7.6.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.1-7.7">
             <p id="section-5.1-7.7.1">The URI Template <span class="bcp14">MUST NOT</span> use Reserved Expansion ("+" operator), Fragment
