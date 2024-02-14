@@ -133,29 +133,29 @@ authentication schemes.
 # Relaying Connections
 
 When the client acts as a transport-layer protocol relay (i.e., forwarding TCP
-connections), it is crucial for the reverse tunnel protocol to both signal the
-establishment of the relayed connection and identify the client-side of the
-connection being relayed.
+connections), it is crucial for the reverse tunnel protocol to convey the
+client-side identity of the relayed connection to the tunnel server.
 
 Upon receiving a request to establish a reverse tunnel, a client acting as a
-relay SHOULD initially send an informational HTTP response with the status code
-100 (Continue). This indicates that the client may serve as a tunnel, but no
-connections are immediately available to be relayed.
+relay matches a connection to be relayed, and sends a successful response (i.e.,
+101 Switching Protocols or 200 OK, depending on the HTTP protocol version in
+use). Then, the client starts relaying the bytes being sent and received between
+the tunnel and the matched connection.
 
-Once a connection eligible for relay becomes available, the client sends a
-successful response (i.e., 101 Switching Protocols or 200 OK, depending on the
-HTTP protocol version in use) to indicate the commencement of its relay
-operations.
+When sending the successful response of 101 (Switching Protocols) or 200 (OK),
+the client SHOULD include a "Forwarded" header field {{!FORWARDED=RFC7239}} that
+identifies the client side of the connection being relayed.
 
-This successful response SHOULD include the "Forwarded" header field
-{{!FORWARDED=RFC7239}} that identifies the client side of the connection being
-relayed.
+If the client cannot immediately match a connection to be relayed, the client
+MAY send an informational response of 100 (Continue) to acknowledge that it has
+received the request but it is not yet ready to send a final response.
 
-The client MAY issue 100 (Continue) responses multiple times.
+This informational response MAY be sent more than once.
 
-If the client instantly matches a connection to be relayed upon receiving a
-tunnel establishment request, the client MAY omit the 100 (Continue) response
-and directly send a successful response.
+When the client gives up waiting for a matching connection to become available,
+the client SHOULD send a 204 (No Content) response to indicate that it
+successfully processed the request, but a matching connection was not
+available.
 
 {{fig-tcp-relay}} illustrates an exchange of HTTP/1.1 messages to establish a
 reverse TCP relay.
