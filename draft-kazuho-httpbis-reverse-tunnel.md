@@ -222,6 +222,9 @@ However, when the client acts as a transport-layer protocol relay (i.e.,
 relaying TCP connections), it becomes the responsibility of the reverse tunnel
 protocol to convey the client-side idenity of the TCP connection being relayed.
 
+
+## Signalling Client Address
+
 Upon receiving a request to establish a reverse tunnel, a client acting as a
 relay SHOULD match a connection to be relayed before sending a successful
 response (i.e., 101 Switching Protocols or 200 OK, depending on the HTTP
