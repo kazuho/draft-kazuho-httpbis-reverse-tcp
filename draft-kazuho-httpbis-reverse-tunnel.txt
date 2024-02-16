@@ -271,7 +271,7 @@ Table of Contents
 
 6.  Relaying Connections
 
-   When a client is forwarding at the application protocwl layer, it can
+   When a client is forwarding at the application protocol layer, it can
    utilize mechanisms provided by the application protocol in use to
    convey the identity of the actual client from which messages were
    received.  For example, HTTP intermediaries acting as reverse tunnel
