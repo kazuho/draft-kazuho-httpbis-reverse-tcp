@@ -77,7 +77,8 @@ Table of Contents
      5.1.  Indicating Protocols Available for Use
      5.2.  Indicating the Chosen Protocol
    6.  Relaying Connections
-     6.1.  Specifying the Listening Address and Port
+     6.1.  Signalling Client Address
+     6.2.  Specifying the Listening Address and Port
    7.  IANA Considerations
    8.  References
      8.1.  Normative References
@@ -247,7 +248,7 @@ Table of Contents
    tunnel server is the origin and the tunnel client is the reverse
    proxy.
 
-   GET /reverse-connect/proxy/for/service/X HTTP/1.1
+   GET /reverse-http-for-service/X HTTP/1.1
    Host: example.com
    Connection: upgrade
    Upgrade: reverse
@@ -282,6 +283,8 @@ Table of Contents
    (i.e., relaying TCP connections), it becomes the responsibility of
    the reverse tunnel protocol to convey the client-side idenity of the
    TCP connection being relayed.
+
+6.1.  Signalling Client Address
 
    Upon receiving a request to establish a reverse tunnel, a client
    acting as a relay SHOULD match a connection to be relayed before
@@ -323,7 +326,7 @@ Table of Contents
 
                 Figure 3: Establishing a TCP relay for SMTP
 
-6.1.  Specifying the Listening Address and Port
+6.2.  Specifying the Listening Address and Port
 
    Clients acting as relays that allow servers specify the listening
    address or port SHOULD use the following URI Template [TEMPLATE] to

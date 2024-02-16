@@ -1170,7 +1170,10 @@ exposure.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-relaying-connections" class="internal xref">Relaying Connections</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
-                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-specifying-the-listening-ad" class="internal xref">Specifying the Listening Address and Port</a></p>
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-signalling-client-address" class="internal xref">Signalling Client Address</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-specifying-the-listening-ad" class="internal xref">Specifying the Listening Address and Port</a></p>
 </li>
             </ul>
 </li>
@@ -1378,7 +1381,7 @@ is the origin and the tunnel client is the reverse proxy.<a href="#section-5.2-5
 <figure id="figure-2">
           <div class="alignLeft art-text artwork" id="section-5.2-6.1">
 <pre>
-GET /reverse-connect/proxy/for/service/X HTTP/1.1
+GET /reverse-http-for-service/X HTTP/1.1
 Host: example.com
 Connection: upgrade
 Upgrade: reverse
@@ -1419,27 +1422,32 @@ field <span>[<a href="#FORWARDED" class="cite xref">FORWARDED</a>]</span> to eac
 <p id="section-6-2">However, when the client acts as a transport-layer protocol relay (i.e.,
 relaying TCP connections), it becomes the responsibility of the reverse tunnel
 protocol to convey the client-side idenity of the TCP connection being relayed.<a href="#section-6-2" class="pilcrow">¶</a></p>
-<p id="section-6-3">Upon receiving a request to establish a reverse tunnel, a client acting as a
+<div id="signalling-client-address">
+<section id="section-6.1">
+        <h3 id="name-signalling-client-address">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-signalling-client-address" class="section-name selfRef">Signalling Client Address</a>
+        </h3>
+<p id="section-6.1-1">Upon receiving a request to establish a reverse tunnel, a client acting as a
 relay <span class="bcp14">SHOULD</span> match a connection to be relayed before sending a successful
 response (i.e., 101 Switching Protocols or 200 OK, depending on the HTTP
 protocol version in use). Once a connection has been matched, the client <span class="bcp14">SHOULD</span>
 send a successful response with a "Forwarded" header field <span>[<a href="#FORWARDED" class="cite xref">FORWARDED</a>]</span>
 carrying the client-side identity of the TCP connection being relayed. After
 that, the client begins relaying the bytes being sent and received between the
-tunnel and the matched connection.<a href="#section-6-3" class="pilcrow">¶</a></p>
-<p id="section-6-4">If the client cannot immediately match a connection to be relayed, the client
+tunnel and the matched connection.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-2">If the client cannot immediately match a connection to be relayed, the client
 <span class="bcp14">MAY</span> send an informational response of 100 (Continue) to acknowledge that it has
-received the request but it is not yet ready to send a final response.<a href="#section-6-4" class="pilcrow">¶</a></p>
-<p id="section-6-5">This informational response <span class="bcp14">MAY</span> be sent more than once.<a href="#section-6-5" class="pilcrow">¶</a></p>
-<p id="section-6-6">When the client gives up waiting for a matching connection to become available,
+received the request but it is not yet ready to send a final response.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.1-3">This informational response <span class="bcp14">MAY</span> be sent more than once.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.1-4">When the client gives up waiting for a matching connection to become available,
 the client <span class="bcp14">SHOULD</span> send a 204 (No Content) response to indicate that it
 successfully processed the request, but a matching connection was not
-available.<a href="#section-6-6" class="pilcrow">¶</a></p>
-<p id="section-6-7"><a href="#fig-tcp-relay" class="auto internal xref">Figure 3</a> illustrates an exchange of HTTP/1.1 messages to establish a
-reverse TCP relay.<a href="#section-6-7" class="pilcrow">¶</a></p>
+available.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
+<p id="section-6.1-5"><a href="#fig-tcp-relay" class="auto internal xref">Figure 3</a> illustrates an exchange of HTTP/1.1 messages to establish a
+reverse TCP relay.<a href="#section-6.1-5" class="pilcrow">¶</a></p>
 <span id="name-establishing-a-tcp-relay-fo"></span><div id="fig-tcp-relay">
 <figure id="figure-3">
-        <div class="alignLeft art-text artwork" id="section-6-8.1">
+          <div class="alignLeft art-text artwork" id="section-6.1-6.1">
 <pre>
 GET /.well-known/listen-tcp/0.0.0.0/25/ HTTP/1.1
 Host: example.com
@@ -1458,66 +1466,68 @@ Forwarded: for=192.0.2.43
 </div>
 <figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
 <a href="#name-establishing-a-tcp-relay-fo" class="selfRef">Establishing a TCP relay for SMTP</a>
-        </figcaption></figure>
+          </figcaption></figure>
+</div>
+</section>
 </div>
 <div id="specifying-the-listening-address-and-port">
-<section id="section-6.1">
+<section id="section-6.2">
         <h3 id="name-specifying-the-listening-ad">
-<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-specifying-the-listening-ad" class="section-name selfRef">Specifying the Listening Address and Port</a>
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-specifying-the-listening-ad" class="section-name selfRef">Specifying the Listening Address and Port</a>
         </h3>
-<p id="section-6.1-1">Clients acting as relays that allow servers specify the listening address or
+<p id="section-6.2-1">Clients acting as relays that allow servers specify the listening address or
 port <span class="bcp14">SHOULD</span> use the following URI Template <span>[<a href="#TEMPLATE" class="cite xref">TEMPLATE</a>]</span> to define the
 target URI on which they provide the service. Adopting this template simplifies
 operations by ensuring a uniform method for configuring endpoints. Examples are
-shown below:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.1-2">
+shown below:<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-6.2-2">
 <pre>
 https://example.com/.well-known/reverse/tcp/{listen_host}/{listen_port}/
 https://example.org/listen/to/tcp?h={listen_host}&amp;p={listen_port}
-</pre><a href="#section-6.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-6.2-2" class="pilcrow">¶</a>
 </div>
-<p id="section-6.1-3">Furthermore, the use of the default template is <span class="bcp14">RECOMMENDED</span>, which is defined as
+<p id="section-6.2-3">Furthermore, the use of the default template is <span class="bcp14">RECOMMENDED</span>, which is defined as
 "https://$CLIENT_HOST:$CLIENT_PORT/.well-known/reverse/tcp/{listen_host}/{listen_port}/",
-where $CLIENT_HOST and $CLIENT_PORT are the host and port of the client.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
-<p id="section-6.1-4">The "listen_host" variable specifies the listening address. This variable <span class="bcp14">MAY</span>
-contain an wildcard address.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
-<p id="section-6.1-5">The "listen_port" variable specifies the listening port.<a href="#section-6.1-5" class="pilcrow">¶</a></p>
-<p id="section-6.1-6">The following requirements apply to the URI Template:<a href="#section-6.1-6" class="pilcrow">¶</a></p>
+where $CLIENT_HOST and $CLIENT_PORT are the host and port of the client.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.2-4">The "listen_host" variable specifies the listening address. This variable <span class="bcp14">MAY</span>
+contain an wildcard address.<a href="#section-6.2-4" class="pilcrow">¶</a></p>
+<p id="section-6.2-5">The "listen_port" variable specifies the listening port.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
+<p id="section-6.2-6">The following requirements apply to the URI Template:<a href="#section-6.2-6" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.1-7.1">
-            <p id="section-6.1-7.1.1">The URI Template <span class="bcp14">MUST</span> be a level 3 template or lower.<a href="#section-6.1-7.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.2-7.1">
+            <p id="section-6.2-7.1.1">The URI Template <span class="bcp14">MUST</span> be a level 3 template or lower.<a href="#section-6.2-7.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-6.1-7.2">
-            <p id="section-6.1-7.2.1">The URI Template <span class="bcp14">MUST</span> be in absolute form and <span class="bcp14">MUST</span> include non-empty scheme,
-authority, and path components.<a href="#section-6.1-7.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.2-7.2">
+            <p id="section-6.2-7.2.1">The URI Template <span class="bcp14">MUST</span> be in absolute form and <span class="bcp14">MUST</span> include non-empty scheme,
+authority, and path components.<a href="#section-6.2-7.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-6.1-7.3">
-            <p id="section-6.1-7.3.1">The path component of the URI Template <span class="bcp14">MUST</span> start with a slash ("/").<a href="#section-6.1-7.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.2-7.3">
+            <p id="section-6.2-7.3.1">The path component of the URI Template <span class="bcp14">MUST</span> start with a slash ("/").<a href="#section-6.2-7.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-6.1-7.4">
-            <p id="section-6.1-7.4.1">All template variables <span class="bcp14">MUST</span> be within the path or query components of the URI.<a href="#section-6.1-7.4.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.2-7.4">
+            <p id="section-6.2-7.4.1">All template variables <span class="bcp14">MUST</span> be within the path or query components of the URI.<a href="#section-6.2-7.4.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-6.1-7.5">
-            <p id="section-6.1-7.5.1">The URI template <span class="bcp14">MUST</span> contain the two variables "listen_host" and
-"listen_port", and <span class="bcp14">MAY</span> contain other variables.<a href="#section-6.1-7.5.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.2-7.5">
+            <p id="section-6.2-7.5.1">The URI template <span class="bcp14">MUST</span> contain the two variables "listen_host" and
+"listen_port", and <span class="bcp14">MAY</span> contain other variables.<a href="#section-6.2-7.5.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-6.1-7.6">
-            <p id="section-6.1-7.6.1">The URI Template <span class="bcp14">MUST NOT</span> contain any non-ASCII Unicode characters and <span class="bcp14">MUST</span>
+          <li class="normal" id="section-6.2-7.6">
+            <p id="section-6.2-7.6.1">The URI Template <span class="bcp14">MUST NOT</span> contain any non-ASCII Unicode characters and <span class="bcp14">MUST</span>
 only contain ASCII characters in the range 0x21-0x7E inclusive (note that
-percent-encoding is allowed; see <span>[<a href="#URI" class="cite xref">URI</a>]</span> Section 2.1).<a href="#section-6.1-7.6.1" class="pilcrow">¶</a></p>
+percent-encoding is allowed; see <span>[<a href="#URI" class="cite xref">URI</a>]</span> Section 2.1).<a href="#section-6.2-7.6.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-6.1-7.7">
-            <p id="section-6.1-7.7.1">The URI Template <span class="bcp14">MUST NOT</span> use Reserved Expansion ("+" operator), Fragment
+          <li class="normal" id="section-6.2-7.7">
+            <p id="section-6.2-7.7.1">The URI Template <span class="bcp14">MUST NOT</span> use Reserved Expansion ("+" operator), Fragment
 Expansion ("#" operator), Label Expansion with Dot-Prefix, Path Segment
 Expansion with Slash-Prefix, nor Path-Style Parameter Expansion with
-Semicolon-Prefix.<a href="#section-6.1-7.7.1" class="pilcrow">¶</a></p>
+Semicolon-Prefix.<a href="#section-6.2-7.7.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-6.1-8">Servers <span class="bcp14">SHOULD</span> validate the requirements above; however, servers <span class="bcp14">MAY</span> use a
+<p id="section-6.2-8">Servers <span class="bcp14">SHOULD</span> validate the requirements above; however, servers <span class="bcp14">MAY</span> use a
 general-purpose URI Template implementation that lacks this specific validation.
 If a server detects that any of the requirements above are not met by a URI
 Template, the server <span class="bcp14">MUST</span> reject its configuration and abort the request without
-sending it to the relaying client.<a href="#section-6.1-8" class="pilcrow">¶</a></p>
+sending it to the relaying client.<a href="#section-6.2-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
