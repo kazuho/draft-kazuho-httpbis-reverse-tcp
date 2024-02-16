@@ -272,7 +272,7 @@ Table of Contents
    utilize mechanisms provided by the application protocol in use to
    convey the identity of the actual client from which messages were
    received.  For example, HTTP intermediaries acting as reverse tunnel
-   clients can add the "Fowarded" header field [FORWARDED] to each
+   clients can add the "Forwarded" header field [FORWARDED] to each
    request they relay.
 
    However, when the client acts as a transport-layer protocol relay
