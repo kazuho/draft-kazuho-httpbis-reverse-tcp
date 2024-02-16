@@ -187,7 +187,7 @@ sets up a tunnel for forwarding HTTP requests using HTTP/2, where tunnel server
 is the origin and the tunnel client is the reverse proxy.
 
 ~~~
-GET /reverse-connect/proxy/for/service/X HTTP/1.1
+GET /reverse-http-for-service/X HTTP/1.1
 Host: example.com
 Connection: upgrade
 Upgrade: reverse
