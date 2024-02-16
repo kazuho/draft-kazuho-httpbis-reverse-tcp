@@ -212,7 +212,7 @@ protocol other than the ones being offered has been selected.
 
 # Relaying Connections
 
-When a client is forwarding at the application protocwl layer, it can utilize
+When a client is forwarding at the application protocol layer, it can utilize
 mechanisms provided by the application protocol in use to convey the identity of
 the actual client from which messages were received. For example, HTTP
 intermediaries acting as reverse tunnel clients can add the "Forwarded" header
