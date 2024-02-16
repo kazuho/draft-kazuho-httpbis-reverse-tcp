@@ -22,10 +22,9 @@ streams in the direction from servers to their clients, utilizing HTTP as a
 tunneling mechanism. This approach not only facilitates communication between
 servers located behind firewalls and their known clients but also introduces the
 potential for these known clients to serve as relays. In such configurations,
-clients can forward application protocol messages or relay TCP connections. This
-capability allows servers to interact with any client on the Internet without
-direct exposure, significantly reducing their attack surface and enhancing
-security.
+clients can forward application protocol messages or relay TCP connections,
+allowing servers to interact with any client on the Internet without direct
+exposure.
 
 
 --- middle
