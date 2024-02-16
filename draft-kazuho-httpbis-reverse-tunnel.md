@@ -220,7 +220,7 @@ field {{!FORWARDED=RFC7239}} to each request they relay.
 
 However, when the client acts as a transport-layer protocol relay (i.e.,
 relaying TCP connections), it becomes the responsibility of the reverse tunnel
-protocol to convey the client-side idenity of the TCP connection being relayed.
+protocol to convey the 4 tuple of the TCP connection being relayed.
 
 
 ## Signalling Client Address
@@ -230,9 +230,12 @@ relay SHOULD match a connection to be relayed before sending a successful
 response (i.e., 101 Switching Protocols or 200 OK, depending on the HTTP
 protocol version in use). Once a connection has been matched, the client SHOULD
 send a successful response with a "Forwarded" header field {{FORWARDED}}
-carrying the client-side identity of the TCP connection being relayed. After
-that, the client begins relaying the bytes being sent and received between the
-tunnel and the matched connection.
+carrying the identity of the TCP connection being relayed. After that, the
+client begins relaying the bytes being sent and received between the tunnel and
+the matched connection.
+
+The "Forwarded" header field SHOULD include the "by" parameter and the "for"
+parameter to convey the 4 tuple of the TCP connection being relayed.
 
 If the client cannot immediately match a connection to be relayed, the client
 MAY send an informational response of 100 (Continue) to acknowledge that it has
