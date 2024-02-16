@@ -20,9 +20,9 @@ normative:
 This document specifies an HTTP extension to establish bi-directional byte
 streams in the direction from servers to their clients, utilizing HTTP as a
 tunneling mechanism. This approach facilitates the operation of servers located
-behind firewalls, which accept connections through TCP relays, as well as
-application-protocol-specific servers, such as HTTP origins connecting to HTTP
-proxies.
+behind firewalls that communicate with known clients. The tunnel can also be
+used by TCP relays to forward incoming TCP connections to servers behind
+firewalls.
 
 
 --- middle
@@ -56,10 +56,12 @@ it shifts client identification from relying on IP addresses and port numbers to
 using URIs, thereby enhancing flexibility and integration with web technologies.
 
 As servers specify their clients using URIs, only clients known to a server can
-communicate directly with it. Nevertheless, clients have the capability to act
-as relays, forwarding TCP connections or application-level messages (e.g., HTTP
-requests) that they accept or receive from the Internet to the servers connected
-through the reverse tunnel.
+communicate directly with it. Nevertheless, clients have the capability to
+forward application protocol-level messages (e.g., HTTP requests) or relay TCP
+connections they receive or accept from the Internet. Through such relay
+mechanisms, servers hidden behind firewalls can effectively receive requests
+from any client on the Internet, bridging the gap between restricted access and
+global connectivity.
 
 
 # Conventions and Definitions
@@ -128,114 +130,6 @@ Servers SHOULD authenticate themselves either by using one of the HTTP-based
 authentication schemes; e.g., HTTP Authentication ({{HTTP-SEMANTICS}}
 Section 11), or, when HTTPS is used, by using one of the TLS-based
 authentication schemes.
-
-
-# Relaying Connections
-
-When the client acts as a transport-layer protocol relay (i.e., forwarding TCP
-connections), it is crucial for the reverse tunnel protocol to convey the
-client-side identity of the relayed connection to the tunnel server.
-
-Upon receiving a request to establish a reverse tunnel, a client acting as a
-relay matches a connection to be relayed, and sends a successful response (i.e.,
-101 Switching Protocols or 200 OK, depending on the HTTP protocol version in
-use). Then, the client starts relaying the bytes being sent and received between
-the tunnel and the matched connection.
-
-When sending the successful response of 101 (Switching Protocols) or 200 (OK),
-the client SHOULD include a "Forwarded" header field {{!FORWARDED=RFC7239}} that
-identifies the client side of the connection being relayed.
-
-If the client cannot immediately match a connection to be relayed, the client
-MAY send an informational response of 100 (Continue) to acknowledge that it has
-received the request but it is not yet ready to send a final response.
-
-This informational response MAY be sent more than once.
-
-When the client gives up waiting for a matching connection to become available,
-the client SHOULD send a 204 (No Content) response to indicate that it
-successfully processed the request, but a matching connection was not
-available.
-
-{{fig-tcp-relay}} illustrates an exchange of HTTP/1.1 messages to establish a
-reverse TCP relay.
-
-~~~
-GET /.well-known/listen-tcp/0.0.0.0/25/ HTTP/1.1
-Host: example.com
-Connection: upgrade
-Upgrade: reverse
-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
-
-HTTP/1.1 100 Continue
-
-HTTP/1.1 101 Switching Protocols
-Connection: upgrade
-Upgrade: reverse
-Forwarded: for=192.0.2.43
-
-~~~
-{: #fig-tcp-relay title="Establishing a TCP relay for SMTP"}
-
-When the client is forwarding at the application protocol layer, rather than
-relaying the bytes exchanged on the transport, the client MAY use mechanisms
-provided by the application protocols to convey the identity of the client being
-relayed. For instance, a client acting as an HTTP proxy can forward HTTP
-requests to servers on the HTTP request level, incorporating the IP address of
-the original HTTP clients by adding the "Forwarded" header field to each HTTP
-request it forwards.
-
-
-## Specifying the Listening Address and Port
-
-Clients acting as relays that allow servers specify the listening address or
-port SHOULD use the following URI Template {{!TEMPLATE=RFC6570}} to define the
-target URI on which they provide the service. Adopting this template simplifies
-operations by ensuring a uniform method for configuring endpoints. Examples are
-shown below:
-
-~~~
-https://example.com/.well-known/reverse/tcp/{listen_host}/{listen_port}/
-https://example.org/listen/to/tcp?h={listen_host}&p={listen_port}
-~~~
-
-Furthermore, the use of the default template is RECOMMENDED, which is defined as
-"https://$CLIENT_HOST:$CLIENT_PORT/.well-known/reverse/tcp/{listen_host}/{listen_port}/",
-where $CLIENT_HOST and $CLIENT_PORT are the host and port of the client.
-
-The "listen_host" variable specifies the listening address. This variable MAY
-contain an wildcard address.
-
-The "listen_port" variable specifies the listening port.
-
-The following requirements apply to the URI Template:
-
-* The URI Template MUST be a level 3 template or lower.
-
-* The URI Template MUST be in absolute form and MUST include non-empty scheme,
-  authority, and path components.
-
-* The path component of the URI Template MUST start with a slash ("/").
-
-* All template variables MUST be within the path or query components of the URI.
-
-* The URI template MUST contain the two variables "listen_host" and
-  "listen_port", and MAY contain other variables.
-
-* The URI Template MUST NOT contain any non-ASCII Unicode characters and MUST
-  only contain ASCII characters in the range 0x21-0x7E inclusive (note that
-  percent-encoding is allowed; see {{!URI=RFC3886}} Section 2.1).
-
-*  The URI Template MUST NOT use Reserved Expansion ("+" operator), Fragment
-   Expansion ("#" operator), Label Expansion with Dot-Prefix, Path Segment
-   Expansion with Slash-Prefix, nor Path-Style Parameter Expansion with
-   Semicolon-Prefix.
-
-Servers SHOULD validate the requirements above; however, servers MAY use a
-general-purpose URI Template implementation that lacks this specific validation.
-If a server detects that any of the requirements above are not met by a URI
-Template, the server MUST reject its configuration and abort the request without
-sending it to the relaying client.
 
 
 # Application-Layer Protocol Negotiation
@@ -312,6 +206,111 @@ an indication that the client chose an application protocol that the server did
 not offer, or that the server could not determine which application protocol has
 been chosen. Therefore, the client SHOULD NOT assume that an application
 protocol other than the ones being offered has been selected.
+
+
+# Relaying Connections
+
+When a client is forwarding at the application protocwl layer, it can utilize
+mechanisms provided by the application protocol in use to convey the identity of
+the actual client from which messages were received. For example, HTTP
+intermediaries acting as reverse tunnel clients can add the "Fowarded" header
+field {{!FORWARDED=RFC7239}} to each request they relay.
+
+However, when the client acts as a transport-layer protocol relay (i.e.,
+relaying TCP connections), it becomes the responsibility of the reverse tunnel
+protocol to convey the client-side idenity of the TCP connection being relayed.
+
+Upon receiving a request to establish a reverse tunnel, a client acting as a
+relay SHOULD match a connection to be relayed before sending a successful
+response (i.e., 101 Switching Protocols or 200 OK, depending on the HTTP
+protocol version in use). Once a connection has been matched, the client SHOULD
+send a successful response with a "Forwarded" header field {{FORWARDED}}
+carrying the client-side identity of the TCP connection being relayed. After
+that, the client begins relaying the bytes being sent and received between the
+tunnel and the matched connection.
+
+If the client cannot immediately match a connection to be relayed, the client
+MAY send an informational response of 100 (Continue) to acknowledge that it has
+received the request but it is not yet ready to send a final response.
+
+This informational response MAY be sent more than once.
+
+When the client gives up waiting for a matching connection to become available,
+the client SHOULD send a 204 (No Content) response to indicate that it
+successfully processed the request, but a matching connection was not
+available.
+
+{{fig-tcp-relay}} illustrates an exchange of HTTP/1.1 messages to establish a
+reverse TCP relay.
+
+~~~
+GET /.well-known/listen-tcp/0.0.0.0/25/ HTTP/1.1
+Host: example.com
+Connection: upgrade
+Upgrade: reverse
+Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+
+HTTP/1.1 100 Continue
+
+HTTP/1.1 101 Switching Protocols
+Connection: upgrade
+Upgrade: reverse
+Forwarded: for=192.0.2.43
+
+~~~
+{: #fig-tcp-relay title="Establishing a TCP relay for SMTP"}
+
+
+## Specifying the Listening Address and Port
+
+Clients acting as relays that allow servers specify the listening address or
+port SHOULD use the following URI Template {{!TEMPLATE=RFC6570}} to define the
+target URI on which they provide the service. Adopting this template simplifies
+operations by ensuring a uniform method for configuring endpoints. Examples are
+shown below:
+
+~~~
+https://example.com/.well-known/reverse/tcp/{listen_host}/{listen_port}/
+https://example.org/listen/to/tcp?h={listen_host}&p={listen_port}
+~~~
+
+Furthermore, the use of the default template is RECOMMENDED, which is defined as
+"https://$CLIENT_HOST:$CLIENT_PORT/.well-known/reverse/tcp/{listen_host}/{listen_port}/",
+where $CLIENT_HOST and $CLIENT_PORT are the host and port of the client.
+
+The "listen_host" variable specifies the listening address. This variable MAY
+contain an wildcard address.
+
+The "listen_port" variable specifies the listening port.
+
+The following requirements apply to the URI Template:
+
+* The URI Template MUST be a level 3 template or lower.
+
+* The URI Template MUST be in absolute form and MUST include non-empty scheme,
+  authority, and path components.
+
+* The path component of the URI Template MUST start with a slash ("/").
+
+* All template variables MUST be within the path or query components of the URI.
+
+* The URI template MUST contain the two variables "listen_host" and
+  "listen_port", and MAY contain other variables.
+
+* The URI Template MUST NOT contain any non-ASCII Unicode characters and MUST
+  only contain ASCII characters in the range 0x21-0x7E inclusive (note that
+  percent-encoding is allowed; see {{!URI=RFC3886}} Section 2.1).
+
+*  The URI Template MUST NOT use Reserved Expansion ("+" operator), Fragment
+   Expansion ("#" operator), Label Expansion with Dot-Prefix, Path Segment
+   Expansion with Slash-Prefix, nor Path-Style Parameter Expansion with
+   Semicolon-Prefix.
+
+Servers SHOULD validate the requirements above; however, servers MAY use a
+general-purpose URI Template implementation that lacks this specific validation.
+If a server detects that any of the requirements above are not met by a URI
+Template, the server MUST reject its configuration and abort the request without
+sending it to the relaying client.
 
 
 # IANA Considerations
