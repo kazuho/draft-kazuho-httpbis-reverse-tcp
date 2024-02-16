@@ -213,7 +213,7 @@ protocol other than the ones being offered has been selected.
 When a client is forwarding at the application protocwl layer, it can utilize
 mechanisms provided by the application protocol in use to convey the identity of
 the actual client from which messages were received. For example, HTTP
-intermediaries acting as reverse tunnel clients can add the "Fowarded" header
+intermediaries acting as reverse tunnel clients can add the "Forwarded" header
 field {{!FORWARDED=RFC7239}} to each request they relay.
 
 However, when the client acts as a transport-layer protocol relay (i.e.,
