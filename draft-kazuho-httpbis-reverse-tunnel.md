@@ -19,10 +19,13 @@ normative:
 
 This document specifies an HTTP extension to establish bi-directional byte
 streams in the direction from servers to their clients, utilizing HTTP as a
-tunneling mechanism. This approach facilitates the operation of servers located
-behind firewalls that communicate with known clients. The tunnel can also be
-used by TCP relays to forward incoming TCP connections to servers behind
-firewalls.
+tunneling mechanism. This approach not only facilitates communication between
+servers located behind firewalls and their known clients but also introduces the
+potential for these known clients to serve as relays. In such configurations,
+clients can forward application protocol messages or relay TCP connections. This
+capability allows servers to interact with any client on the Internet without
+direct exposure, significantly reducing their attack surface and enhancing
+security.
 
 
 --- middle
