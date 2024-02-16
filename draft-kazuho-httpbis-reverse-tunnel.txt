@@ -506,6 +506,9 @@ Acknowledgments
    This document is inspired by [I-D.bt-httpbis-reverse-http-01] and the
    discussion at IETF 118.
 
+   Thanks to Ben Schwartz for reviewing the initial version of the draft
+   and providing valuable feedback.
+
 Author's Address
 
    Kazuho Oku
