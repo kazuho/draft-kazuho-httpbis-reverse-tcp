@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>Reverse Tunnel over HTTP</title>
+<meta content="Kazuho Oku" name="author">
+<meta content="
+       This document specifies an HTTP extension to establish bi-directional byte
+streams in the direction from servers to their clients, utilizing HTTP as a
+tunneling mechanism. This approach not only facilitates communication between
+servers located behind firewalls and their known clients but also introduces the
+potential for these known clients to serve as relays. In such configurations,
+clients can forward application protocol messages or relay TCP connections,
+allowing servers to interact with any client on the Internet without direct
+exposure. 
+    " name="description">
+<meta content="xml2rfc 3.19.4" name="generator">
+<meta content="internet-draft" name="keyword">
+<meta content="draft-kazuho-httpbis-reverse-tunnel-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.19.4
+    Python 3.11.6
+    ConfigArgParse 1.7
+    google-i18n-address 3.1.0
+    intervaltree 3.1.0
+    Jinja2 3.1.2
+    lxml 4.9.3
+    platformdirs 4.2.0
+    pycountry 22.3.5
+    PyYAML 6.0.1
+    requests 2.31.0
+    setuptools 68.2.2
+    six 1.16.0
+    wcwidth 0.2.13
+-->
+<link href="draft-kazuho-httpbis-reverse-tunnel.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Cabin Condensed", sans-serif;
+  font-weight: 600;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1#title {
+  font-size: 32px;
+  line-height: 40px;
+  clear: both;
+}
+h1#title, h1#rfcnum {
+  margin: 1.5em 0 0.2em;
+}
+h1#rfcnum + h1#title {
+  margin: 0.2em 0;
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+}
+#abstract+p code, #abstract+p samp, #abstract+p tt {
+  font-size: 16px;
+  line-height: 0;
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+/* font-family isn't space-separated, but =~ will have to do */
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  border: none;
+  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+  display: table;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+}
+:is(ol, ul) :is(ol, ul) {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  line-height: 1;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+}
+dl.olPercent {
+  --indent: 5ch;
+}
+dl > dt {
+  float: left;
+  margin-right: 2ch;
+  min-width: 8ch;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+dl > dd {
+  margin-bottom: .8em;
+  margin-left: var(--indent) !important; /* stupid element overrides */
+  min-height: 2ex;
+}
+dl.olPercent > dt {
+  min-width: calc(var(--indent) - 2ch);
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:first-child, .break:first-child + *) {
+  margin-top: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:last-child) {
+  margin-bottom: 0;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a, a[href].selfRef:hover {
+  text-decoration: none;
+}
+a[href] {
+  color: var(--link-color);
+}
+a[href].selfRef, .iref + a[href].internal {
+  color: var(--text-color);
+}
+a[href]:hover {
+  text-decoration: underline;
+}
+a[href].selfRef:hover {
+  background-color: var(--highlight-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) p {
+    margin: -2px 0;
+    max-height: 0;
+    transition: max-height 2s ease, margin 0.5s ease 0.5s;
+    overflow: hidden;
+  }
+  :is(#status-of-memo, #copyright):hover p,
+  :is(#status-of-memo, #copyright) h2:target ~ p {
+    margin: 0.5em 0;
+    max-height: 500px;
+    overflow: auto;
+  }
+  pre, svg {
+    display: inline-block;
+    overflow-x: auto;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+}
+table.right {
+  margin-left: auto;
+}
+table.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+table.left {
+  margin-right: auto;
+}
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+table caption {
+  margin: 0;
+  padding: 3px 0 3px 1em;
+}
+table p {
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+}
+a.pilcrow[href] { color: var(--pilcrow-weak); }
+a.pilcrow[href]:hover { text-decoration: none; }
+@media not print {
+  :hover > a.pilcrow {
+    opacity: 1;
+  }
+  a.pilcrow[href]:hover {
+    color: var(--pilcrow-strong);
+    background-color: transparent;
+  }
+}
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+}
+#identifiers dt {
+  width: var(--identifier-width);
+  min-width: var(--identifier-width);
+  clear: left;
+  float: left;
+  text-align: right;
+  margin-right: 1ch;
+}
+#identifiers dd {
+  margin: 0;
+  margin-left: calc(1em + var(--identifier-width)) !important;
+  min-width: 5em;
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+#toc nav ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+#toc nav li {
+  line-height: 1.3em;
+  margin: 2px 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+#toc a.xref {
+  white-space: normal;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 10ch;
+  margin-right: 1.5ch;
+}
+.references dt:target::before {
+  content: "⇒";
+  width: 15px;
+  margin: 0 10px 0 -25px;
+}
+.references dd {
+  margin-left: 12ch !important;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses > section {
+    column-count: 2;
+    column-gap: 20px;
+  }
+  #authors-addresses > section > h2 {
+    column-span: all;
+  }
+  /* hack for break-inside: avoid-column */
+  #authors-addresses address {
+    display: inline-block;
+    break-inside: avoid-column;
+  }
+}
+
+.rfcEditorRemove p:first-of-type {
+  font-style: italic;
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 1px 0 0 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+  }
+  #toc.active {
+      opacity: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 2px 0 2px 6px;
+    padding-right: 1em;
+    font-size: 18px;
+    line-height: 24px;
+    min-width: 190px;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 8px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    background-color: var(--background-color);
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+  #toc.active nav {
+    display: block;
+  }
+  /* Make the collapsed ToC header render white on gray also when it's a link */
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+  #toc a.toplink {
+    margin-top: 2px;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 2em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  #toc nav > ul  {
+    margin-bottom: 2em;
+  }
+  #toc ul {
+    margin: 0 0 0 4px;
+    font-size: var(--small-font-size);
+  }
+  #toc ul :is(p, li) {
+    margin: 2px 0;
+    line-height: 22px;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre, .vcard {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  :is(h2, h3, h4, h5, h6)+*, dd {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+  .toplink {
+    display: none;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Changes introduced to fix issues found during implementation */
+
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin: 8px 0.5em 0;
+}
+
+/* Provide styling for table cell text alignment */
+table .text-left {
+  text-align: left;
+}
+table .text-center {
+  text-align: center;
+}
+table .text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 20em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg :is([stroke="black"], [stroke^="#000"]) {
+  stroke: var(--text-color);
+}
+svg :is([stroke="white"], [stroke^="#fff"]) {
+  stroke: var(--background-color);
+}
+svg :is([fill="black"], [fill^="#000"], :not([fill])) {
+  fill: var(--text-color);
+}
+svg :is([fill="white"], [fill^="#fff"]) {
+  fill: var(--background-color);
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">Reverse Tunnel over HTTP</td>
+<td class="right">February 2024</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Oku</td>
+<td class="center">Expires 23 August 2024</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">httpbis</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-kazuho-httpbis-reverse-tunnel-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2024-02-20" class="published">20 February 2024</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Standards Track</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2024-08-23">23 August 2024</time></dd>
+<dt class="label-authors">Author:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">K. Oku</div>
+<div class="org">Fastly</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">Reverse Tunnel over HTTP</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document specifies an HTTP extension to establish bi-directional byte
+streams in the direction from servers to their clients, utilizing HTTP as a
+tunneling mechanism. This approach not only facilitates communication between
+servers located behind firewalls and their known clients but also introduces the
+potential for these known clients to serve as relays. In such configurations,
+clients can forward application protocol messages or relay TCP connections,
+allowing servers to interact with any client on the Internet without direct
+exposure.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-discussion-venues">
+<a href="#name-discussion-venues" class="section-name selfRef">Discussion Venues</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">Discussion of this document takes place on the
+    HTTP Working Group mailing list (ietf-http-wg@w3.org),
+    which is archived at <span><a href="https://lists.w3.org/Archives/Public/ietf-http-wg/">https://lists.w3.org/Archives/Public/ietf-http-wg/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">Source for this draft and an issue tracker can be found at
+    <span><a href="https://github.com/kazuho/draft-kazuho-httpbis-reverse-tunnel">https://github.com/kazuho/draft-kazuho-httpbis-reverse-tunnel</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 23 August 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2024 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-the-protocol" class="internal xref">The Protocol</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-http-11" class="internal xref">HTTP/1.1</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-http-2-and-http-3" class="internal xref">HTTP/2 and HTTP/3</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-authentication" class="internal xref">Authentication</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-application-layer-protocol-" class="internal xref">Application-Layer Protocol Negotiation</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-indicating-protocols-availa" class="internal xref">Indicating Protocols Available for Use</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-indicating-the-chosen-proto" class="internal xref">Indicating the Chosen Protocol</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-relaying-connections" class="internal xref">Relaying Connections</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-signalling-client-address" class="internal xref">Signalling Client Address</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-specifying-the-listening-ad" class="internal xref">Specifying the Listening Address and Port</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">In typical application protocols operating on top of TCP, clients initiate TCP
+connections by specifying the server's IP address and the port number. However,
+not all servers can accept incoming TCP connections directly.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">Presently, servers situated behind firewalls that block incoming TCP connections
+often rely on virtual private networks (VPNs). These VPNs enable the passage of
+packets initiating TCP connections to servers through encapsulation, effectively
+bypassing firewall restrictions. This approach, however, compromises network
+manageability and incurs performance penalties due to the additional routing and
+encapsulation involved.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">This document proposes an alternative to utilizing VPNs by defining a method for
+servers to establish connections to clients over HTTP, thereby creating
+bi-directional byte streams for application protocols. Specifically, this
+extension employs HTTP upgrades in HTTP/1.1 (<span>[<a href="#HTTP-SEMANTICS" class="cite xref">HTTP-SEMANTICS</a>]</span> Section 7.8) and
+the "extended CONNECT" method in HTTP/2 <span>[<a href="#EXTENDED-CONNECT-H2" class="cite xref">EXTENDED-CONNECT-H2</a>]</span> and
+HTTP/3 <span>[<a href="#EXTENDED-CONNECT-H3" class="cite xref">EXTENDED-CONNECT-H3</a>]</span> for the establishment of these byte
+streams.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">Beyond better manageability and reduced performance overhead in comparison to
+VPNs, this method of employing HTTP for tunnel establishment provides additional
+advantages. It enables endpoints to utilize a variety of authentication schemes
+that are native to HTTP, such as HTTP authentication and cookies. Furthermore,
+it shifts client identification from relying on IP addresses and port numbers to
+using URIs, thereby enhancing flexibility and integration with web technologies.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">As servers specify their clients using URIs, only clients known to a server can
+communicate directly with it. Nevertheless, clients have the capability to
+forward application protocol-level messages (e.g., HTTP requests) or relay TCP
+connections they receive or accept from the Internet. Through such relay
+mechanisms, servers hidden behind firewalls can effectively receive requests
+from any client on the Internet, bridging the gap between restricted access and
+global connectivity.<a href="#section-1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="conventions-and-definitions">
+<section id="section-2">
+      <h2 id="name-conventions-and-definitions">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+      </h2>
+<p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="the-protocol">
+<section id="section-3">
+      <h2 id="name-the-protocol">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-the-protocol" class="section-name selfRef">The Protocol</a>
+      </h2>
+<p id="section-3-1">To setup a reverse tunnel, a server connects to the client as specified by the
+URI and issues an HTTP request.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">To signal the intent to establish a reverse tunnel, an upgrade token named
+"reverse" is used.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">The method and the conveyor of the upgrade token are different between the HTTP
+versions.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<div id="http11">
+<section id="section-3.1">
+        <h3 id="name-http-11">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-http-11" class="section-name selfRef">HTTP/1.1</a>
+        </h3>
+<p id="section-3.1-1">In HTTP/1.1, the HTTP upgrade mechanism (<span>[<a href="#HTTP-SEMANTICS" class="cite xref">HTTP-SEMANTICS</a>]</span> Section 7.8) is
+used.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">The method of the issued request <span class="bcp14">SHALL</span> be "GET".<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-3">The upgrade token is conveyed by the "Upgrade" header field, and once the
+reverse tunnel is established successfully, the client responds with a 101
+(Swithing Protocols) response.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-4"><a href="#fig-tunnel-establishment" class="auto internal xref">Figure 1</a> shows an exchange of HTTP/1.1 request and response
+establishing a reverse tunnel. In this example, the Basic HTTP Authentication
+Scheme <span>[<a href="#BASIC-AUTH" class="cite xref">BASIC-AUTH</a>]</span> is used to authenticate the server.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+<span id="name-establishing-reverse-tunnel"></span><div id="fig-tunnel-establishment">
+<figure id="figure-1">
+          <div class="alignLeft art-text artwork" id="section-3.1-5.1">
+<pre>
+GET /reverse-endpoint HTTP/1.1
+Host: example.com
+Connection: upgrade
+Upgrade: reverse
+Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+
+HTTP/1.1 101 Switching Protocols
+Connection: upgrade
+Upgrade: reverse
+
+</pre>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-establishing-reverse-tunnel" class="selfRef">Establishing Reverse Tunnel over HTTP/1.1</a>
+          </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="http2-and-http3">
+<section id="section-3.2">
+        <h3 id="name-http-2-and-http-3">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-http-2-and-http-3" class="section-name selfRef">HTTP/2 and HTTP/3</a>
+        </h3>
+<p id="section-3.2-1">In HTTP/2 and HTTP/3, extended CONNECT is used; see <span>[<a href="#EXTENDED-CONNECT-H2" class="cite xref">EXTENDED-CONNECT-H2</a>]</span> and
+<span>[<a href="#EXTENDED-CONNECT-H3" class="cite xref">EXTENDED-CONNECT-H3</a>]</span>.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">In both HTTP versions, the method being used is "CONNECT" and the upgrade
+token is conveyed by the ":protocol" pseudo header. Once the reverse tunnel is
+established successfully, the client responds with a 200 (OK) response.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="authentication">
+<section id="section-4">
+      <h2 id="name-authentication">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-authentication" class="section-name selfRef">Authentication</a>
+      </h2>
+<p id="section-4-1">When HTTPS is used for establishing the tunnel, clients (i.e., the nodes acting
+as TLS <span>[<a href="#TLS" class="cite xref">TLS</a>]</span> servers) <span class="bcp14">SHOULD</span> use one of the TLS-based authentication
+schemes to identify themselves.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">Servers <span class="bcp14">SHOULD</span> authenticate themselves either by using one of the HTTP-based
+authentication schemes; e.g., HTTP Authentication (<span>[<a href="#HTTP-SEMANTICS" class="cite xref">HTTP-SEMANTICS</a>]</span>
+Section 11), or, when HTTPS is used, by using one of the TLS-based
+authentication schemes.<a href="#section-4-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="application-layer-protocol-negotiation">
+<section id="section-5">
+      <h2 id="name-application-layer-protocol-">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-application-layer-protocol-" class="section-name selfRef">Application-Layer Protocol Negotiation</a>
+      </h2>
+<p id="section-5-1">While TLS <span>[<a href="#TLS" class="cite xref">TLS</a>]</span> can be used on top of an established tunnel, doing so might
+not be necessary for ensuring the security of communication if the tunnel is
+established via HTTPS, and the client side of the reverse tunnel also functions
+as the client side of the application protocol in use. A typical scenario
+involves an HTTPS reverse proxy serving as the client of a reverse tunnel. This
+proxy terminates incoming TLS connections and decrypts the HTTP requests before
+forwarding them through the reverse tunnel, which is secured by a separate TLS
+connection.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">In these deployments, foregoing the use of TLS above the established tunnel can
+yield performance benefits without compromising security. However, this approach
+requires that endpoints negotiate the application protocol without relying on
+the Application-Layer Protocol Negotiation <span>[<a href="#ALPN" class="cite xref">ALPN</a>]</span> performed during
+the TLS handshake.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<p id="section-5-3">To address this need, this document introduces an HTTP header-based mechanism
+for negotiating the application protocol. It employs ALPN identifiers for naming
+the application protocols, allowing for the selection of existing application
+protocols without depending on TLS-based negotiation.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<div id="indicating-protocols-available-for-use">
+<section id="section-5.1">
+        <h3 id="name-indicating-protocols-availa">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-indicating-protocols-availa" class="section-name selfRef">Indicating Protocols Available for Use</a>
+        </h3>
+<p id="section-5.1-1">To indicate the application protocols that the server is willing to utilize, a
+server <span class="bcp14">MAY</span> include an "ALPN" header field <span>[<a href="#ALPN-HEADER" class="cite xref">ALPN-HEADER</a>]</span> in the HTTP
+request that it issues. The "ALPN" header field carries a list of
+application-protocol identifies that the server is willing to use.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="indicating-the-chosen-protocol">
+<section id="section-5.2">
+        <h3 id="name-indicating-the-chosen-proto">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-indicating-the-chosen-proto" class="section-name selfRef">Indicating the Chosen Protocol</a>
+        </h3>
+<p id="section-5.2-1">When a client receives an HTTP request with an "ALPN" header field, and if the
+client decides to select one of the application protocols being offered, the
+client includes a "Selected-ALPN" header field in the HTTP response.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">If the HTTP request does not include an "ALPN" header field, the client <span class="bcp14">MUST NOT</span>
+send a "Selected-ALPN" header field.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-3">Syntax of the "Selected-ALPN" header field is as follows. The syntax reuses the
+encoding of the "ALPN" header field, but always includes exactly one
+application-protocol identifier that is being chosen.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.2-4">
+<pre>
+Selected-ALPN = ALPN
+</pre><a href="#section-5.2-4" class="pilcrow">¶</a>
+</div>
+<p id="section-5.2-5"><a href="#fig-alpn-request" class="auto internal xref">Figure 2</a> shows an exchange of HTTP/1.1 response and response that
+sets up a tunnel for forwarding HTTP requests using HTTP/2, where tunnel server
+is the origin and the tunnel client is the reverse proxy.<a href="#section-5.2-5" class="pilcrow">¶</a></p>
+<span id="name-setting-up-a-http-2-tunnel-"></span><div id="fig-alpn-request">
+<figure id="figure-2">
+          <div class="alignLeft art-text artwork" id="section-5.2-6.1">
+<pre>
+GET /reverse-http-for-service/X HTTP/1.1
+Host: example.com
+Connection: upgrade
+Upgrade: reverse
+Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+ALPN: h2, http%2F1.1
+
+HTTP/1.1 101 Switching Protocols
+Connection: upgrade
+Upgrade: reverse
+Selected-ALPN: h2
+
+</pre>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-setting-up-a-http-2-tunnel-" class="selfRef">Setting up a HTTP/2 Tunnel for forwarding HTTP Requests</a>
+          </figcaption></figure>
+</div>
+<p id="section-5.2-7">When a server sends an HTTP request with an "ALPN" header field but receives a
+successful response without a "Selected-ALPN" header field, it could either be
+an indication that the client chose an application protocol that the server did
+not offer, or that the server could not determine which application protocol has
+been chosen. Therefore, the client <span class="bcp14">SHOULD NOT</span> assume that an application
+protocol other than the ones being offered has been selected.<a href="#section-5.2-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="relaying-connections">
+<section id="section-6">
+      <h2 id="name-relaying-connections">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-relaying-connections" class="section-name selfRef">Relaying Connections</a>
+      </h2>
+<p id="section-6-1">When a client is forwarding at the application protocol layer, it can utilize
+mechanisms provided by the application protocol in use to convey the identity of
+the actual client from which messages were received. For example, HTTP
+intermediaries acting as reverse tunnel clients can add the "Forwarded" header
+field <span>[<a href="#FORWARDED" class="cite xref">FORWARDED</a>]</span> to each request they relay.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">However, when the client acts as a transport-layer protocol relay (i.e.,
+relaying TCP connections), it becomes the responsibility of the reverse tunnel
+protocol to convey the 4 tuple of the TCP connection being relayed.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<div id="signalling-client-address">
+<section id="section-6.1">
+        <h3 id="name-signalling-client-address">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-signalling-client-address" class="section-name selfRef">Signalling Client Address</a>
+        </h3>
+<p id="section-6.1-1">Upon receiving a request to establish a reverse tunnel, a client acting as a
+relay <span class="bcp14">SHOULD</span> match a connection to be relayed before sending a successful
+response (i.e., 101 Switching Protocols or 200 OK, depending on the HTTP
+protocol version in use). Once a connection has been matched, the client <span class="bcp14">SHOULD</span>
+send a successful response with a "Forwarded" header field <span>[<a href="#FORWARDED" class="cite xref">FORWARDED</a>]</span>
+carrying the identity of the TCP connection being relayed. After that, the
+client begins relaying the bytes being sent and received between the tunnel and
+the matched connection.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-2">The "Forwarded" header field <span class="bcp14">SHOULD</span> include the "by" parameter and the "for"
+parameter to convey the 4 tuple of the TCP connection being relayed.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.1-3">If the client cannot immediately match a connection to be relayed, the client
+<span class="bcp14">MAY</span> send an informational response of 100 (Continue) to acknowledge that it has
+received the request but it is not yet ready to send a final response.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.1-4">This informational response <span class="bcp14">MAY</span> be sent more than once.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
+<p id="section-6.1-5">When the client gives up waiting for a matching connection to become available,
+the client <span class="bcp14">SHOULD</span> send a 204 (No Content) response to indicate that it
+successfully processed the request, but a matching connection was not
+available.<a href="#section-6.1-5" class="pilcrow">¶</a></p>
+<p id="section-6.1-6"><a href="#fig-tcp-relay" class="auto internal xref">Figure 3</a> illustrates an exchange of HTTP/1.1 messages to establish a
+reverse TCP relay.<a href="#section-6.1-6" class="pilcrow">¶</a></p>
+<span id="name-establishing-a-tcp-relay-fo"></span><div id="fig-tcp-relay">
+<figure id="figure-3">
+          <div class="alignLeft art-text artwork" id="section-6.1-7.1">
+<pre>
+GET /.well-known/listen-tcp/0.0.0.0/25/ HTTP/1.1
+Host: example.com
+Connection: upgrade
+Upgrade: reverse
+Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+
+HTTP/1.1 100 Continue
+
+HTTP/1.1 101 Switching Protocols
+Connection: upgrade
+Upgrade: reverse
+Forwarded: for=192.0.2.43
+
+</pre>
+</div>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-establishing-a-tcp-relay-fo" class="selfRef">Establishing a TCP relay for SMTP</a>
+          </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="specifying-the-listening-address-and-port">
+<section id="section-6.2">
+        <h3 id="name-specifying-the-listening-ad">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-specifying-the-listening-ad" class="section-name selfRef">Specifying the Listening Address and Port</a>
+        </h3>
+<p id="section-6.2-1">Clients acting as relays that allow servers specify the listening address or
+port <span class="bcp14">SHOULD</span> use the following URI Template <span>[<a href="#TEMPLATE" class="cite xref">TEMPLATE</a>]</span> to define the
+target URI on which they provide the service. Adopting this template simplifies
+operations by ensuring a uniform method for configuring endpoints. Examples are
+shown below:<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-6.2-2">
+<pre>
+https://example.com/.well-known/reverse/tcp/{listen_host}/{listen_port}/
+https://example.org/listen/to/tcp?h={listen_host}&amp;p={listen_port}
+</pre><a href="#section-6.2-2" class="pilcrow">¶</a>
+</div>
+<p id="section-6.2-3">Furthermore, the use of the default template is <span class="bcp14">RECOMMENDED</span>, which is defined as
+"https://$CLIENT_HOST:$CLIENT_PORT/.well-known/reverse/tcp/{listen_host}/{listen_port}/",
+where $CLIENT_HOST and $CLIENT_PORT are the host and port of the client.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.2-4">The "listen_host" variable specifies the listening address. This variable <span class="bcp14">MAY</span>
+contain an wildcard address.<a href="#section-6.2-4" class="pilcrow">¶</a></p>
+<p id="section-6.2-5">The "listen_port" variable specifies the listening port.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
+<p id="section-6.2-6">The following requirements apply to the URI Template:<a href="#section-6.2-6" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.2-7.1">
+            <p id="section-6.2-7.1.1">The URI Template <span class="bcp14">MUST</span> be a level 3 template or lower.<a href="#section-6.2-7.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-7.2">
+            <p id="section-6.2-7.2.1">The URI Template <span class="bcp14">MUST</span> be in absolute form and <span class="bcp14">MUST</span> include non-empty scheme,
+authority, and path components.<a href="#section-6.2-7.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-7.3">
+            <p id="section-6.2-7.3.1">The path component of the URI Template <span class="bcp14">MUST</span> start with a slash ("/").<a href="#section-6.2-7.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-7.4">
+            <p id="section-6.2-7.4.1">All template variables <span class="bcp14">MUST</span> be within the path or query components of the URI.<a href="#section-6.2-7.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-7.5">
+            <p id="section-6.2-7.5.1">The URI template <span class="bcp14">MUST</span> contain the two variables "listen_host" and
+"listen_port", and <span class="bcp14">MAY</span> contain other variables.<a href="#section-6.2-7.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-7.6">
+            <p id="section-6.2-7.6.1">The URI Template <span class="bcp14">MUST NOT</span> contain any non-ASCII Unicode characters and <span class="bcp14">MUST</span>
+only contain ASCII characters in the range 0x21-0x7E inclusive (note that
+percent-encoding is allowed; see <span>[<a href="#URI" class="cite xref">URI</a>]</span> Section 2.1).<a href="#section-6.2-7.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-7.7">
+            <p id="section-6.2-7.7.1">The URI Template <span class="bcp14">MUST NOT</span> use Reserved Expansion ("+" operator), Fragment
+Expansion ("#" operator), Label Expansion with Dot-Prefix, Path Segment
+Expansion with Slash-Prefix, nor Path-Style Parameter Expansion with
+Semicolon-Prefix.<a href="#section-6.2-7.7.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-6.2-8">Servers <span class="bcp14">SHOULD</span> validate the requirements above; however, servers <span class="bcp14">MAY</span> use a
+general-purpose URI Template implementation that lacks this specific validation.
+If a server detects that any of the requirements above are not met by a URI
+Template, the server <span class="bcp14">MUST</span> reject its configuration and abort the request without
+sending it to the relaying client.<a href="#section-6.2-8" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="iana-considerations">
+<section id="section-7">
+      <h2 id="name-iana-considerations">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-7-1">Once approved, this document will request IANA to register the following entries
+to the respective registries.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">To the "HTTP Upgrade Tokens" registry maintained at
+<a href="https://www.iana.org/assignments/http-upgrade-tokens">https://www.iana.org/assignments/http-upgrade-tokens</a>:<a href="#section-7-2" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7-3">
+        <dt id="section-7-3.1">Value:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-3.2">
+          <p id="section-7-3.2.1">reverse<a href="#section-7-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-3.3">Description:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-3.4">
+          <p id="section-7-3.4.1">Reverse Tunnel<a href="#section-7-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-3.5">Expected Version Tokens:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-3.6">
+          <p id="section-7-3.6.1">None<a href="#section-7-3.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-3.7">Reference:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-3.8">
+          <p id="section-7-3.8.1">this document<a href="#section-7-3.8.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+<p id="section-7-4">To the "Hypertext Transfer Protocol (HTTP) Field Name Registry" maintained at
+<a href="https://www.iana.org/assignments/http-fields">https://www.iana.org/assignments/http-fields</a>:<a href="#section-7-4" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7-5">
+        <dt id="section-7-5.1">Field Name:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-5.2">
+          <p id="section-7-5.2.1">Selected-ALPN<a href="#section-7-5.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-5.3">Template:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-5.4">
+          <p id="section-7-5.4.1">None<a href="#section-7-5.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-5.5">Status:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-5.6">
+          <p id="section-7-5.6.1">permanent<a href="#section-7-5.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-5.7">Reference:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-5.8">
+          <p id="section-7-5.8.1">this document<a href="#section-7-5.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-5.9">Comments:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-5.10">
+          <p id="section-7-5.10.1">None<a href="#section-7-5.10.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+<p id="section-7-6">To the "Well-Known URIs" registry maintained at
+<a href="https://www.iana.org/assignments/well-known-uris">https://www.iana.org/assignments/well-known-uris</a>:<a href="#section-7-6" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7-7">
+        <dt id="section-7-7.1">URI Suffix:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-7.2">
+          <p id="section-7-7.2.1">listen-tcp<a href="#section-7-7.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-7.3">Change Controller:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-7.4">
+          <p id="section-7-7.4.1">IETF<a href="#section-7-7.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-7.5">Reference:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-7.6">
+          <p id="section-7-7.6.1">this document<a href="#section-7-7.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-7.7">Status:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-7.8">
+          <p id="section-7-7.8.1">permanent<a href="#section-7-7.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-7.9">Related Information:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-7.10">
+          <p id="section-7-7.10.1">Includes all resources identified with the path prefix
+"./well-known/listen-tcp/".<a href="#section-7-7.10.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<section id="section-8">
+      <h2 id="name-references">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-8.1">
+        <h3 id="name-normative-references">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="ALPN">[ALPN]</dt>
+        <dd>
+<span class="refAuthor">Friedl, S.</span>, <span class="refAuthor">Popov, A.</span>, <span class="refAuthor">Langley, A.</span>, and <span class="refAuthor">E. Stephan</span>, <span class="refTitle">"Transport Layer Security (TLS) Application-Layer Protocol Negotiation Extension"</span>, <span class="seriesInfo">RFC 7301</span>, <span class="seriesInfo">DOI 10.17487/RFC7301</span>, <time datetime="2014-07" class="refDate">July 2014</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7301">https://www.rfc-editor.org/rfc/rfc7301</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="ALPN-HEADER">[ALPN-HEADER]</dt>
+        <dd>
+<span class="refAuthor">Hutton, A.</span>, <span class="refAuthor">Uberti, J.</span>, and <span class="refAuthor">M. Thomson</span>, <span class="refTitle">"The ALPN HTTP Header Field"</span>, <span class="seriesInfo">RFC 7639</span>, <span class="seriesInfo">DOI 10.17487/RFC7639</span>, <time datetime="2015-08" class="refDate">August 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7639">https://www.rfc-editor.org/rfc/rfc7639</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="EXTENDED-CONNECT-H2">[EXTENDED-CONNECT-H2]</dt>
+        <dd>
+<span class="refAuthor">McManus, P.</span>, <span class="refTitle">"Bootstrapping WebSockets with HTTP/2"</span>, <span class="seriesInfo">RFC 8441</span>, <span class="seriesInfo">DOI 10.17487/RFC8441</span>, <time datetime="2018-09" class="refDate">September 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8441">https://www.rfc-editor.org/rfc/rfc8441</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="EXTENDED-CONNECT-H3">[EXTENDED-CONNECT-H3]</dt>
+        <dd>
+<span class="refAuthor">Hamilton, R.</span>, <span class="refTitle">"Bootstrapping WebSockets with HTTP/3"</span>, <span class="seriesInfo">RFC 9220</span>, <span class="seriesInfo">DOI 10.17487/RFC9220</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9220">https://www.rfc-editor.org/rfc/rfc9220</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="FORWARDED">[FORWARDED]</dt>
+        <dd>
+<span class="refAuthor">Petersson, A.</span> and <span class="refAuthor">M. Nilsson</span>, <span class="refTitle">"Forwarded HTTP Extension"</span>, <span class="seriesInfo">RFC 7239</span>, <span class="seriesInfo">DOI 10.17487/RFC7239</span>, <time datetime="2014-06" class="refDate">June 2014</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7239">https://www.rfc-editor.org/rfc/rfc7239</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="HTTP-SEMANTICS">[HTTP-SEMANTICS]</dt>
+        <dd>
+<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP Semantics"</span>, <span class="seriesInfo">STD 97</span>, <span class="seriesInfo">RFC 9110</span>, <span class="seriesInfo">DOI 10.17487/RFC9110</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9110">https://www.rfc-editor.org/rfc/rfc9110</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+        <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="TEMPLATE">[TEMPLATE]</dt>
+        <dd>
+<span class="refAuthor">Gregorio, J.</span>, <span class="refAuthor">Fielding, R.</span>, <span class="refAuthor">Hadley, M.</span>, <span class="refAuthor">Nottingham, M.</span>, and <span class="refAuthor">D. Orchard</span>, <span class="refTitle">"URI Template"</span>, <span class="seriesInfo">RFC 6570</span>, <span class="seriesInfo">DOI 10.17487/RFC6570</span>, <time datetime="2012-03" class="refDate">March 2012</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6570">https://www.rfc-editor.org/rfc/rfc6570</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="URI">[URI]</dt>
+      <dd>
+<span class="refAuthor">Allman, E.</span>, <span class="refTitle">"An Extensible Message Format for Message Tracking Responses"</span>, <span class="seriesInfo">RFC 3886</span>, <span class="seriesInfo">DOI 10.17487/RFC3886</span>, <time datetime="2004-09" class="refDate">September 2004</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3886">https://www.rfc-editor.org/rfc/rfc3886</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-8.2">
+        <h3 id="name-informative-references">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="BASIC-AUTH">[BASIC-AUTH]</dt>
+        <dd>
+<span class="refAuthor">Reschke, J.</span>, <span class="refTitle">"The 'Basic' HTTP Authentication Scheme"</span>, <span class="seriesInfo">RFC 7617</span>, <span class="seriesInfo">DOI 10.17487/RFC7617</span>, <time datetime="2015-09" class="refDate">September 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7617">https://www.rfc-editor.org/rfc/rfc7617</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.bt-httpbis-reverse-http-01">[I-D.bt-httpbis-reverse-http-01]</dt>
+        <dd>
+<span class="refAuthor">Schwartz, B. M.</span>, <span class="refAuthor">Reddy.K, T.</span>, <span class="refAuthor">Boucadair, M.</span>, and <span class="refAuthor">P. S. Tiesel</span>, <span class="refTitle">"Reverse HTTP Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-bt-httpbis-reverse-http-01</span>, <time datetime="2023-10-23" class="refDate">23 October 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-bt-httpbis-reverse-http-01">https://datatracker.ietf.org/doc/html/draft-bt-httpbis-reverse-http-01</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="TLS">[TLS]</dt>
+      <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+<div id="acknowledgments">
+<section id="appendix-A">
+      <h2 id="name-acknowledgments">
+<a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      </h2>
+<p id="appendix-A-1">This document is inspired by <span>[<a href="#I-D.bt-httpbis-reverse-http-01" class="cite xref">I-D.bt-httpbis-reverse-http-01</a>]</span> and the
+discussion at IETF 118.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-2">Thanks to Ben Schwartz for reviewing the initial version of the draft and
+providing valuable feedback.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-B">
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Kazuho Oku</span></div>
+<div dir="auto" class="left"><span class="org">Fastly</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:kazuhooku@gmail.com" class="email">kazuhooku@gmail.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>

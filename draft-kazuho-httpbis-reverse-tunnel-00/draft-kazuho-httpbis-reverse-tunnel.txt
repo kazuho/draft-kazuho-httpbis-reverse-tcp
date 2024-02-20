@@ -1,0 +1,516 @@
+
+
+
+
+httpbis                                                           K. Oku
+Internet-Draft                                                    Fastly
+Intended status: Standards Track                        20 February 2024
+Expires: 23 August 2024
+
+
+                        Reverse Tunnel over HTTP
+               draft-kazuho-httpbis-reverse-tunnel-latest
+
+Abstract
+
+   This document specifies an HTTP extension to establish bi-directional
+   byte streams in the direction from servers to their clients,
+   utilizing HTTP as a tunneling mechanism.  This approach not only
+   facilitates communication between servers located behind firewalls
+   and their known clients but also introduces the potential for these
+   known clients to serve as relays.  In such configurations, clients
+   can forward application protocol messages or relay TCP connections,
+   allowing servers to interact with any client on the Internet without
+   direct exposure.
+
+Discussion Venues
+
+   This note is to be removed before publishing as an RFC.
+
+   Discussion of this document takes place on the HTTP Working Group
+   mailing list (ietf-http-wg@w3.org), which is archived at
+   https://lists.w3.org/Archives/Public/ietf-http-wg/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/kazuho/draft-kazuho-httpbis-reverse-tunnel.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 23 August 2024.
+
+Copyright Notice
+
+   Copyright (c) 2024 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Conventions and Definitions
+   3.  The Protocol
+     3.1.  HTTP/1.1
+     3.2.  HTTP/2 and HTTP/3
+   4.  Authentication
+   5.  Application-Layer Protocol Negotiation
+     5.1.  Indicating Protocols Available for Use
+     5.2.  Indicating the Chosen Protocol
+   6.  Relaying Connections
+     6.1.  Signalling Client Address
+     6.2.  Specifying the Listening Address and Port
+   7.  IANA Considerations
+   8.  References
+     8.1.  Normative References
+     8.2.  Informative References
+   Acknowledgments
+   Author's Address
+
+1.  Introduction
+
+   In typical application protocols operating on top of TCP, clients
+   initiate TCP connections by specifying the server's IP address and
+   the port number.  However, not all servers can accept incoming TCP
+   connections directly.
+
+   Presently, servers situated behind firewalls that block incoming TCP
+   connections often rely on virtual private networks (VPNs).  These
+   VPNs enable the passage of packets initiating TCP connections to
+   servers through encapsulation, effectively bypassing firewall
+   restrictions.  This approach, however, compromises network
+   manageability and incurs performance penalties due to the additional
+   routing and encapsulation involved.
+
+   This document proposes an alternative to utilizing VPNs by defining a
+   method for servers to establish connections to clients over HTTP,
+   thereby creating bi-directional byte streams for application
+   protocols.  Specifically, this extension employs HTTP upgrades in
+   HTTP/1.1 ([HTTP-SEMANTICS] Section 7.8) and the "extended CONNECT"
+   method in HTTP/2 [EXTENDED-CONNECT-H2] and HTTP/3
+   [EXTENDED-CONNECT-H3] for the establishment of these byte streams.
+
+   Beyond better manageability and reduced performance overhead in
+   comparison to VPNs, this method of employing HTTP for tunnel
+   establishment provides additional advantages.  It enables endpoints
+   to utilize a variety of authentication schemes that are native to
+   HTTP, such as HTTP authentication and cookies.  Furthermore, it
+   shifts client identification from relying on IP addresses and port
+   numbers to using URIs, thereby enhancing flexibility and integration
+   with web technologies.
+
+   As servers specify their clients using URIs, only clients known to a
+   server can communicate directly with it.  Nevertheless, clients have
+   the capability to forward application protocol-level messages (e.g.,
+   HTTP requests) or relay TCP connections they receive or accept from
+   the Internet.  Through such relay mechanisms, servers hidden behind
+   firewalls can effectively receive requests from any client on the
+   Internet, bridging the gap between restricted access and global
+   connectivity.
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+3.  The Protocol
+
+   To setup a reverse tunnel, a server connects to the client as
+   specified by the URI and issues an HTTP request.
+
+   To signal the intent to establish a reverse tunnel, an upgrade token
+   named "reverse" is used.
+
+   The method and the conveyor of the upgrade token are different
+   between the HTTP versions.
+
+3.1.  HTTP/1.1
+
+   In HTTP/1.1, the HTTP upgrade mechanism ([HTTP-SEMANTICS]
+   Section 7.8) is used.
+
+   The method of the issued request SHALL be "GET".
+
+   The upgrade token is conveyed by the "Upgrade" header field, and once
+   the reverse tunnel is established successfully, the client responds
+   with a 101 (Swithing Protocols) response.
+
+   Figure 1 shows an exchange of HTTP/1.1 request and response
+   establishing a reverse tunnel.  In this example, the Basic HTTP
+   Authentication Scheme [BASIC-AUTH] is used to authenticate the
+   server.
+
+   GET /reverse-endpoint HTTP/1.1
+   Host: example.com
+   Connection: upgrade
+   Upgrade: reverse
+   Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+
+   HTTP/1.1 101 Switching Protocols
+   Connection: upgrade
+   Upgrade: reverse
+
+            Figure 1: Establishing Reverse Tunnel over HTTP/1.1
+
+3.2.  HTTP/2 and HTTP/3
+
+   In HTTP/2 and HTTP/3, extended CONNECT is used; see
+   [EXTENDED-CONNECT-H2] and [EXTENDED-CONNECT-H3].
+
+   In both HTTP versions, the method being used is "CONNECT" and the
+   upgrade token is conveyed by the ":protocol" pseudo header.  Once the
+   reverse tunnel is established successfully, the client responds with
+   a 200 (OK) response.
+
+4.  Authentication
+
+   When HTTPS is used for establishing the tunnel, clients (i.e., the
+   nodes acting as TLS [TLS] servers) SHOULD use one of the TLS-based
+   authentication schemes to identify themselves.
+
+   Servers SHOULD authenticate themselves either by using one of the
+   HTTP-based authentication schemes; e.g., HTTP Authentication
+   ([HTTP-SEMANTICS] Section 11), or, when HTTPS is used, by using one
+   of the TLS-based authentication schemes.
+
+5.  Application-Layer Protocol Negotiation
+
+   While TLS [TLS] can be used on top of an established tunnel, doing so
+   might not be necessary for ensuring the security of communication if
+   the tunnel is established via HTTPS, and the client side of the
+   reverse tunnel also functions as the client side of the application
+   protocol in use.  A typical scenario involves an HTTPS reverse proxy
+   serving as the client of a reverse tunnel.  This proxy terminates
+   incoming TLS connections and decrypts the HTTP requests before
+   forwarding them through the reverse tunnel, which is secured by a
+   separate TLS connection.
+
+   In these deployments, foregoing the use of TLS above the established
+   tunnel can yield performance benefits without compromising security.
+   However, this approach requires that endpoints negotiate the
+   application protocol without relying on the Application-Layer
+   Protocol Negotiation [ALPN] performed during the TLS handshake.
+
+   To address this need, this document introduces an HTTP header-based
+   mechanism for negotiating the application protocol.  It employs ALPN
+   identifiers for naming the application protocols, allowing for the
+   selection of existing application protocols without depending on TLS-
+   based negotiation.
+
+5.1.  Indicating Protocols Available for Use
+
+   To indicate the application protocols that the server is willing to
+   utilize, a server MAY include an "ALPN" header field [ALPN-HEADER] in
+   the HTTP request that it issues.  The "ALPN" header field carries a
+   list of application-protocol identifies that the server is willing to
+   use.
+
+5.2.  Indicating the Chosen Protocol
+
+   When a client receives an HTTP request with an "ALPN" header field,
+   and if the client decides to select one of the application protocols
+   being offered, the client includes a "Selected-ALPN" header field in
+   the HTTP response.
+
+   If the HTTP request does not include an "ALPN" header field, the
+   client MUST NOT send a "Selected-ALPN" header field.
+
+   Syntax of the "Selected-ALPN" header field is as follows.  The syntax
+   reuses the encoding of the "ALPN" header field, but always includes
+   exactly one application-protocol identifier that is being chosen.
+
+   Selected-ALPN = ALPN
+
+   Figure 2 shows an exchange of HTTP/1.1 response and response that
+   sets up a tunnel for forwarding HTTP requests using HTTP/2, where
+   tunnel server is the origin and the tunnel client is the reverse
+   proxy.
+
+   GET /reverse-http-for-service/X HTTP/1.1
+   Host: example.com
+   Connection: upgrade
+   Upgrade: reverse
+   Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+   ALPN: h2, http%2F1.1
+
+   HTTP/1.1 101 Switching Protocols
+   Connection: upgrade
+   Upgrade: reverse
+   Selected-ALPN: h2
+
+     Figure 2: Setting up a HTTP/2 Tunnel for forwarding HTTP Requests
+
+   When a server sends an HTTP request with an "ALPN" header field but
+   receives a successful response without a "Selected-ALPN" header
+   field, it could either be an indication that the client chose an
+   application protocol that the server did not offer, or that the
+   server could not determine which application protocol has been
+   chosen.  Therefore, the client SHOULD NOT assume that an application
+   protocol other than the ones being offered has been selected.
+
+6.  Relaying Connections
+
+   When a client is forwarding at the application protocol layer, it can
+   utilize mechanisms provided by the application protocol in use to
+   convey the identity of the actual client from which messages were
+   received.  For example, HTTP intermediaries acting as reverse tunnel
+   clients can add the "Forwarded" header field [FORWARDED] to each
+   request they relay.
+
+   However, when the client acts as a transport-layer protocol relay
+   (i.e., relaying TCP connections), it becomes the responsibility of
+   the reverse tunnel protocol to convey the 4 tuple of the TCP
+   connection being relayed.
+
+6.1.  Signalling Client Address
+
+   Upon receiving a request to establish a reverse tunnel, a client
+   acting as a relay SHOULD match a connection to be relayed before
+   sending a successful response (i.e., 101 Switching Protocols or 200
+   OK, depending on the HTTP protocol version in use).  Once a
+   connection has been matched, the client SHOULD send a successful
+   response with a "Forwarded" header field [FORWARDED] carrying the
+   identity of the TCP connection being relayed.  After that, the client
+   begins relaying the bytes being sent and received between the tunnel
+   and the matched connection.
+
+   The "Forwarded" header field SHOULD include the "by" parameter and
+   the "for" parameter to convey the 4 tuple of the TCP connection being
+   relayed.
+
+   If the client cannot immediately match a connection to be relayed,
+   the client MAY send an informational response of 100 (Continue) to
+   acknowledge that it has received the request but it is not yet ready
+   to send a final response.
+
+   This informational response MAY be sent more than once.
+
+   When the client gives up waiting for a matching connection to become
+   available, the client SHOULD send a 204 (No Content) response to
+   indicate that it successfully processed the request, but a matching
+   connection was not available.
+
+   Figure 3 illustrates an exchange of HTTP/1.1 messages to establish a
+   reverse TCP relay.
+
+   GET /.well-known/listen-tcp/0.0.0.0/25/ HTTP/1.1
+   Host: example.com
+   Connection: upgrade
+   Upgrade: reverse
+   Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+
+   HTTP/1.1 100 Continue
+
+   HTTP/1.1 101 Switching Protocols
+   Connection: upgrade
+   Upgrade: reverse
+   Forwarded: for=192.0.2.43
+
+                Figure 3: Establishing a TCP relay for SMTP
+
+6.2.  Specifying the Listening Address and Port
+
+   Clients acting as relays that allow servers specify the listening
+   address or port SHOULD use the following URI Template [TEMPLATE] to
+   define the target URI on which they provide the service.  Adopting
+   this template simplifies operations by ensuring a uniform method for
+   configuring endpoints.  Examples are shown below:
+
+https://example.com/.well-known/reverse/tcp/{listen_host}/{listen_port}/
+https://example.org/listen/to/tcp?h={listen_host}&p={listen_port}
+
+   Furthermore, the use of the default template is RECOMMENDED, which is
+   defined as "https://$CLIENT_HOST:$CLIENT_PORT/.well-known/reverse/
+   tcp/{listen_host}/{listen_port}/", where $CLIENT_HOST and
+   $CLIENT_PORT are the host and port of the client.
+
+   The "listen_host" variable specifies the listening address.  This
+   variable MAY contain an wildcard address.
+
+   The "listen_port" variable specifies the listening port.
+
+   The following requirements apply to the URI Template:
+
+   *  The URI Template MUST be a level 3 template or lower.
+
+   *  The URI Template MUST be in absolute form and MUST include non-
+      empty scheme, authority, and path components.
+
+   *  The path component of the URI Template MUST start with a slash
+      ("/").
+
+   *  All template variables MUST be within the path or query components
+      of the URI.
+
+   *  The URI template MUST contain the two variables "listen_host" and
+      "listen_port", and MAY contain other variables.
+
+   *  The URI Template MUST NOT contain any non-ASCII Unicode characters
+      and MUST only contain ASCII characters in the range 0x21-0x7E
+      inclusive (note that percent-encoding is allowed; see [URI]
+      Section 2.1).
+
+   *  The URI Template MUST NOT use Reserved Expansion ("+" operator),
+      Fragment Expansion ("#" operator), Label Expansion with Dot-
+      Prefix, Path Segment Expansion with Slash-Prefix, nor Path-Style
+      Parameter Expansion with Semicolon-Prefix.
+
+   Servers SHOULD validate the requirements above; however, servers MAY
+   use a general-purpose URI Template implementation that lacks this
+   specific validation.  If a server detects that any of the
+   requirements above are not met by a URI Template, the server MUST
+   reject its configuration and abort the request without sending it to
+   the relaying client.
+
+7.  IANA Considerations
+
+   Once approved, this document will request IANA to register the
+   following entries to the respective registries.
+
+   To the "HTTP Upgrade Tokens" registry maintained at
+   https://www.iana.org/assignments/http-upgrade-tokens
+   (https://www.iana.org/assignments/http-upgrade-tokens):
+
+   Value:  reverse
+
+   Description:  Reverse Tunnel
+
+   Expected Version Tokens:  None
+
+   Reference:  this document
+
+   To the "Hypertext Transfer Protocol (HTTP) Field Name Registry"
+   maintained at https://www.iana.org/assignments/http-fields
+   (https://www.iana.org/assignments/http-fields):
+
+   Field Name:  Selected-ALPN
+
+   Template:  None
+
+   Status:  permanent
+
+   Reference:  this document
+
+   Comments:  None
+
+   To the "Well-Known URIs" registry maintained at
+   https://www.iana.org/assignments/well-known-uris
+   (https://www.iana.org/assignments/well-known-uris):
+
+   URI Suffix:  listen-tcp
+
+   Change Controller:  IETF
+
+   Reference:  this document
+
+   Status:  permanent
+
+   Related Information:  Includes all resources identified with the path
+      prefix "./well-known/listen-tcp/".
+
+8.  References
+
+8.1.  Normative References
+
+   [ALPN]     Friedl, S., Popov, A., Langley, A., and E. Stephan,
+              "Transport Layer Security (TLS) Application-Layer Protocol
+              Negotiation Extension", RFC 7301, DOI 10.17487/RFC7301,
+              July 2014, <https://www.rfc-editor.org/rfc/rfc7301>.
+
+   [ALPN-HEADER]
+              Hutton, A., Uberti, J., and M. Thomson, "The ALPN HTTP
+              Header Field", RFC 7639, DOI 10.17487/RFC7639, August
+              2015, <https://www.rfc-editor.org/rfc/rfc7639>.
+
+   [EXTENDED-CONNECT-H2]
+              McManus, P., "Bootstrapping WebSockets with HTTP/2",
+              RFC 8441, DOI 10.17487/RFC8441, September 2018,
+              <https://www.rfc-editor.org/rfc/rfc8441>.
+
+   [EXTENDED-CONNECT-H3]
+              Hamilton, R., "Bootstrapping WebSockets with HTTP/3",
+              RFC 9220, DOI 10.17487/RFC9220, June 2022,
+              <https://www.rfc-editor.org/rfc/rfc9220>.
+
+   [FORWARDED]
+              Petersson, A. and M. Nilsson, "Forwarded HTTP Extension",
+              RFC 7239, DOI 10.17487/RFC7239, June 2014,
+              <https://www.rfc-editor.org/rfc/rfc7239>.
+
+   [HTTP-SEMANTICS]
+              Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+              Ed., "HTTP Semantics", STD 97, RFC 9110,
+              DOI 10.17487/RFC9110, June 2022,
+              <https://www.rfc-editor.org/rfc/rfc9110>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [TEMPLATE] Gregorio, J., Fielding, R., Hadley, M., Nottingham, M.,
+              and D. Orchard, "URI Template", RFC 6570,
+              DOI 10.17487/RFC6570, March 2012,
+              <https://www.rfc-editor.org/rfc/rfc6570>.
+
+   [URI]      Allman, E., "An Extensible Message Format for Message
+              Tracking Responses", RFC 3886, DOI 10.17487/RFC3886,
+              September 2004, <https://www.rfc-editor.org/rfc/rfc3886>.
+
+8.2.  Informative References
+
+   [BASIC-AUTH]
+              Reschke, J., "The 'Basic' HTTP Authentication Scheme",
+              RFC 7617, DOI 10.17487/RFC7617, September 2015,
+              <https://www.rfc-editor.org/rfc/rfc7617>.
+
+   [I-D.bt-httpbis-reverse-http-01]
+              Schwartz, B. M., Reddy.K, T., Boucadair, M., and P. S.
+              Tiesel, "Reverse HTTP Transport", Work in Progress,
+              Internet-Draft, draft-bt-httpbis-reverse-http-01, 23
+              October 2023, <https://datatracker.ietf.org/doc/html/
+              draft-bt-httpbis-reverse-http-01>.
+
+   [TLS]      Rescorla, E., "The Transport Layer Security (TLS) Protocol
+              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
+              <https://www.rfc-editor.org/rfc/rfc8446>.
+
+Acknowledgments
+
+   This document is inspired by [I-D.bt-httpbis-reverse-http-01] and the
+   discussion at IETF 118.
+
+   Thanks to Ben Schwartz for reviewing the initial version of the draft
+   and providing valuable feedback.
+
+Author's Address
+
+   Kazuho Oku
+   Fastly
+   Email: kazuhooku@gmail.com
