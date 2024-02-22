@@ -92,7 +92,7 @@ The method of the issued request SHALL be "GET".
 
 The upgrade token is conveyed by the "Upgrade" header field, and once the
 reverse tunnel is established successfully, the client responds with a 101
-(Swithing Protocols) response.
+(Switching Protocols) response.
 
 {{fig-tunnel-establishment}} shows an exchange of HTTP/1.1 request and response
 establishing a reverse tunnel. In this example, the Basic HTTP Authentication
@@ -162,7 +162,7 @@ protocols without depending on TLS-based negotiation.
 To indicate the application protocols that the server is willing to utilize, a
 server MAY include an "ALPN" header field {{!ALPN-HEADER=RFC7639}} in the HTTP
 request that it issues. The "ALPN" header field carries a list of
-application-protocol identifies that the server is willing to use.
+application-protocol identifiers that the server is willing to use.
 
 
 ## Indicating the Chosen Protocol
@@ -182,8 +182,8 @@ application-protocol identifier that is being chosen.
 Selected-ALPN = ALPN
 ~~~
 
-{{fig-alpn-request}} shows an exchange of HTTP/1.1 response and response that
-sets up a tunnel for forwarding HTTP requests using HTTP/2, where tunnel server
+{{fig-alpn-request}} shows an exchange of HTTP/1.1 request and response that
+sets up a tunnel for forwarding HTTP requests using HTTP/2, where the tunnel server
 is the origin and the tunnel client is the reverse proxy.
 
 ~~~
@@ -205,8 +205,8 @@ Selected-ALPN: h2
 When a server sends an HTTP request with an "ALPN" header field but receives a
 successful response without a "Selected-ALPN" header field, it could either be
 an indication that the client chose an application protocol that the server did
-not offer, or that the server could not determine which application protocol has
-been chosen. Therefore, the client SHOULD NOT assume that an application
+not offer, or that the client could not determine which application protocol has
+been chosen. Therefore, the server SHOULD NOT assume that an application
 protocol other than the ones being offered has been selected.
 
 
@@ -223,7 +223,7 @@ relaying TCP connections), it becomes the responsibility of the reverse tunnel
 protocol to convey the 4 tuple of the TCP connection being relayed.
 
 
-## Signalling Client Address
+## Signaling Client Address
 
 Upon receiving a request to establish a reverse tunnel, a client acting as a
 relay SHOULD match a connection to be relayed before sending a successful
@@ -287,7 +287,7 @@ Furthermore, the use of the default template is RECOMMENDED, which is defined as
 where $CLIENT_HOST and $CLIENT_PORT are the host and port of the client.
 
 The "listen_host" variable specifies the listening address. This variable MAY
-contain an wildcard address.
+contain a wildcard address.
 
 The "listen_port" variable specifies the listening port.
 
