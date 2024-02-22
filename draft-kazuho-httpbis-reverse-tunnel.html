@@ -16,11 +16,11 @@ clients can forward application protocol messages or relay TCP connections,
 allowing servers to interact with any client on the Internet without direct
 exposure. 
     " name="description">
-<meta content="xml2rfc 3.19.2" name="generator">
+<meta content="xml2rfc 3.19.4" name="generator">
 <meta content="internet-draft" name="keyword">
 <meta content="draft-kazuho-httpbis-reverse-tunnel-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.19.2
+  xml2rfc 3.19.4
     Python 3.11.6
     ConfigArgParse 1.7
     google-i18n-address 3.1.0
@@ -1036,7 +1036,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Oku</td>
-<td class="center">Expires 19 August 2024</td>
+<td class="center">Expires 25 August 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1049,12 +1049,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-kazuho-httpbis-reverse-tunnel-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-02-16" class="published">16 February 2024</time>
+<time datetime="2024-02-22" class="published">22 February 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-08-19">19 August 2024</time></dd>
+<dd class="expires"><time datetime="2024-08-25">25 August 2024</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1106,7 +1106,7 @@ exposure.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 19 August 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 25 August 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1142,7 +1142,7 @@ exposure.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-the-protocol" class="internal xref">The Protocol</a></p>
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-reverse-tunnel-establishmen" class="internal xref">Reverse Tunnel Establishment</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
                 <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-http-11" class="internal xref">HTTP/1.1</a></p>
@@ -1170,7 +1170,7 @@ exposure.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-relaying-connections" class="internal xref">Relaying Connections</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
-                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-signalling-client-address" class="internal xref">Signalling Client Address</a></p>
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-signaling-client-address" class="internal xref">Signaling Client Address</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
                 <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-specifying-the-listening-ad" class="internal xref">Specifying the Listening Address and Port</a></p>
@@ -1248,12 +1248,12 @@ described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</s
 appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="the-protocol">
+<div id="reverse-tunnel-establishment">
 <section id="section-3">
-      <h2 id="name-the-protocol">
-<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-the-protocol" class="section-name selfRef">The Protocol</a>
+      <h2 id="name-reverse-tunnel-establishmen">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-reverse-tunnel-establishmen" class="section-name selfRef">Reverse Tunnel Establishment</a>
       </h2>
-<p id="section-3-1">To setup a reverse tunnel, a server connects to the client as specified by the
+<p id="section-3-1">To establish a reverse tunnel, a server connects to the client as specified by the
 URI and issues an HTTP request.<a href="#section-3-1" class="pilcrow">¶</a></p>
 <p id="section-3-2">To signal the intent to establish a reverse tunnel, an upgrade token named
 "reverse" is used.<a href="#section-3-2" class="pilcrow">¶</a></p>
@@ -1269,7 +1269,7 @@ used.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 <p id="section-3.1-2">The method of the issued request <span class="bcp14">SHALL</span> be "GET".<a href="#section-3.1-2" class="pilcrow">¶</a></p>
 <p id="section-3.1-3">The upgrade token is conveyed by the "Upgrade" header field, and once the
 reverse tunnel is established successfully, the client responds with a 101
-(Swithing Protocols) response.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+(Switching Protocols) response.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
 <p id="section-3.1-4"><a href="#fig-tunnel-establishment" class="auto internal xref">Figure 1</a> shows an exchange of HTTP/1.1 request and response
 establishing a reverse tunnel. In this example, the Basic HTTP Authentication
 Scheme <span>[<a href="#BASIC-AUTH" class="cite xref">BASIC-AUTH</a>]</span> is used to authenticate the server.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
@@ -1353,7 +1353,7 @@ protocols without depending on TLS-based negotiation.<a href="#section-5-3" clas
 <p id="section-5.1-1">To indicate the application protocols that the server is willing to utilize, a
 server <span class="bcp14">MAY</span> include an "ALPN" header field <span>[<a href="#ALPN-HEADER" class="cite xref">ALPN-HEADER</a>]</span> in the HTTP
 request that it issues. The "ALPN" header field carries a list of
-application-protocol identifies that the server is willing to use.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+application-protocol identifiers that the server is willing to use.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="indicating-the-chosen-protocol">
@@ -1374,8 +1374,8 @@ application-protocol identifier that is being chosen.<a href="#section-5.2-3" cl
 Selected-ALPN = ALPN
 </pre><a href="#section-5.2-4" class="pilcrow">¶</a>
 </div>
-<p id="section-5.2-5"><a href="#fig-alpn-request" class="auto internal xref">Figure 2</a> shows an exchange of HTTP/1.1 response and response that
-sets up a tunnel for forwarding HTTP requests using HTTP/2, where tunnel server
+<p id="section-5.2-5"><a href="#fig-alpn-request" class="auto internal xref">Figure 2</a> shows an exchange of HTTP/1.1 request and response that
+sets up a tunnel for forwarding HTTP requests using HTTP/2, where the tunnel server
 is the origin and the tunnel client is the reverse proxy.<a href="#section-5.2-5" class="pilcrow">¶</a></p>
 <span id="name-setting-up-a-http-2-tunnel-"></span><div id="fig-alpn-request">
 <figure id="figure-2">
@@ -1402,8 +1402,8 @@ Selected-ALPN: h2
 <p id="section-5.2-7">When a server sends an HTTP request with an "ALPN" header field but receives a
 successful response without a "Selected-ALPN" header field, it could either be
 an indication that the client chose an application protocol that the server did
-not offer, or that the server could not determine which application protocol has
-been chosen. Therefore, the client <span class="bcp14">SHOULD NOT</span> assume that an application
+not offer, or that the client could not determine which application protocol has
+been chosen. Therefore, the server <span class="bcp14">SHOULD NOT</span> assume that an application
 protocol other than the ones being offered has been selected.<a href="#section-5.2-7" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1422,10 +1422,10 @@ field <span>[<a href="#FORWARDED" class="cite xref">FORWARDED</a>]</span> to eac
 <p id="section-6-2">However, when the client acts as a transport-layer protocol relay (i.e.,
 relaying TCP connections), it becomes the responsibility of the reverse tunnel
 protocol to convey the 4 tuple of the TCP connection being relayed.<a href="#section-6-2" class="pilcrow">¶</a></p>
-<div id="signalling-client-address">
+<div id="signaling-client-address">
 <section id="section-6.1">
-        <h3 id="name-signalling-client-address">
-<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-signalling-client-address" class="section-name selfRef">Signalling Client Address</a>
+        <h3 id="name-signaling-client-address">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-signaling-client-address" class="section-name selfRef">Signaling Client Address</a>
         </h3>
 <p id="section-6.1-1">Upon receiving a request to establish a reverse tunnel, a client acting as a
 relay <span class="bcp14">SHOULD</span> match a connection to be relayed before sending a successful
@@ -1451,7 +1451,7 @@ reverse TCP relay.<a href="#section-6.1-6" class="pilcrow">¶</a></p>
 <figure id="figure-3">
           <div class="alignLeft art-text artwork" id="section-6.1-7.1">
 <pre>
-GET /.well-known/listen-tcp/0.0.0.0/25/ HTTP/1.1
+GET /.well-known/reverse/tcp/0.0.0.0/25/ HTTP/1.1
 Host: example.com
 Connection: upgrade
 Upgrade: reverse
@@ -1492,7 +1492,7 @@ https://example.org/listen/to/tcp?h={listen_host}&amp;p={listen_port}
 "https://$CLIENT_HOST:$CLIENT_PORT/.well-known/reverse/tcp/{listen_host}/{listen_port}/",
 where $CLIENT_HOST and $CLIENT_PORT are the host and port of the client.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
 <p id="section-6.2-4">The "listen_host" variable specifies the listening address. This variable <span class="bcp14">MAY</span>
-contain an wildcard address.<a href="#section-6.2-4" class="pilcrow">¶</a></p>
+contain a wildcard address.<a href="#section-6.2-4" class="pilcrow">¶</a></p>
 <p id="section-6.2-5">The "listen_port" variable specifies the listening port.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
 <p id="section-6.2-6">The following requirements apply to the URI Template:<a href="#section-6.2-6" class="pilcrow">¶</a></p>
 <ul class="normal">
