@@ -71,9 +71,9 @@ global connectivity.
 {::boilerplate bcp14-tagged}
 
 
-# The Protocol
+# Reverse Tunnel Establishment
 
-To setup a reverse tunnel, a server connects to the client as specified by the
+To establish a reverse tunnel, a server connects to the client as specified by the
 URI and issues an HTTP request.
 
 To signal the intent to establish a reverse tunnel, an upgrade token named
