@@ -252,7 +252,7 @@ available.
 reverse TCP relay.
 
 ~~~
-GET /.well-known/listen-tcp/0.0.0.0/25/ HTTP/1.1
+GET /.well-known/reverse/tcp/0.0.0.0/25/ HTTP/1.1
 Host: example.com
 Connection: upgrade
 Upgrade: reverse
