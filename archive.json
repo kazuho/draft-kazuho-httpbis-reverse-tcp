@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-02-22T00:03:29.528283+00:00",
+  "timestamp": "2024-02-25T00:03:52.722117+00:00",
   "repo": "kazuho/draft-kazuho-httpbis-reverse-tunnel",
   "labels": [
     {
@@ -50,5 +50,42 @@
     }
   ],
   "issues": [],
-  "pulls": []
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOLP-Z3M5nqWvp",
+      "title": "Small fixes",
+      "url": "https://github.com/kazuho/draft-kazuho-httpbis-reverse-tunnel/pull/1",
+      "state": "MERGED",
+      "author": "sharksforarms",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "- fix some typos\r\n- proposed new section name\r\n- fix example to match uri template",
+      "createdAt": "2024-02-22T15:31:47Z",
+      "updatedAt": "2024-02-22T22:44:29Z",
+      "baseRepository": "kazuho/draft-kazuho-httpbis-reverse-tunnel",
+      "baseRefName": "main",
+      "baseRefOid": "9b8a9407b9cb42bf5575a0ce02c5dcf5084d9439",
+      "headRepository": "sharksforarms/draft-kazuho-httpbis-reverse-tunnel",
+      "headRefName": "sharksforarms/typos",
+      "headRefOid": "c202d106ad4d027d014dc815346cd31e6ff992ef",
+      "closedAt": "2024-02-22T22:44:18Z",
+      "mergedAt": "2024-02-22T22:44:18Z",
+      "mergedBy": "kazuho",
+      "mergeCommit": {
+        "oid": "e1051602d2a33e28a95349d14d5f1cbb9e85b43a"
+      },
+      "comments": [
+        {
+          "author": "kazuho",
+          "authorAssociation": "OWNER",
+          "body": "Thank you for the fixes! All changes make sense.",
+          "createdAt": "2024-02-22T22:44:28Z",
+          "updatedAt": "2024-02-22T22:44:28Z"
+        }
+      ],
+      "reviews": []
+    }
+  ]
 }
